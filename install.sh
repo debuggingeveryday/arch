@@ -96,7 +96,7 @@ reflector --latest 10 --protocol https --sort rate --save /etc/pacman.d/mirrorli
 fi
 # -- debugging -- #
 
-pacstrap -i /mnt --needed --noconfirm base base-devel linux linux-firmware archlinux-keyring
+pacstrap -i /mnt --needed --noconfirm base base-devel linux-lts linux-lts-headers linux-firmware archlinux-keyring
 # pacstrap -i /mnt --needed --noconfirm grub
 
 if [ "$BOOT_TYPE" == "EFI" ]; then
@@ -143,11 +143,6 @@ echo "$USERNAME ALL=(ALL) ALL" >> /mnt/etc/sudoers
 
 sed -i "s/#\[multilib]/[multilib]/" /mnt/etc/pacman.conf
 sed -i "$!N;s/\(\[multilib]\n\)#\(Include\)/\1\2/;P;D" /mnt/etc/pacman.conf
-
-echo "
-[g14]
-SigLevel = DatabaseNever Optional TrustAll
-Server = https://arch.asus-linux.org" >> /mnt/etc/pacman.conf
 
 # ----------------- KDE ------------------ #
 

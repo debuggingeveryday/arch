@@ -41,23 +41,6 @@ if [ "$INSTALL_TYPE" == "BASIC-GUI" ]; then
 fi
 # ---------------- DEBUG AREA ------------------ #
 
-# ---------- G14 kernel ---------- #
-
-if [ "$INSTALL_TYPE" == "BASIC-GUI" ]; then
-
-pacman -Syu
-
-pacman -Sy --noconfirm --needed asusctl supergfxctl
-
-systemctl enable supergfxd
-systemctl enable power-profiles-daemon.service
-systemctl --user enable asus-notify.service
-systemctl enable battery-charge-threshold.service
-
-fi
-
-# ---------- G14 kernel ---------- #
-
 # ----------- RUN SERVICES -------------- #
 
 if [ "$DEBUG" != true ] ; then
@@ -100,7 +83,7 @@ pacman -Sy --noconfirm --needed lvm2
 sed -r -i 's/(HOOKS=)\((.*?)\)/\1(base udev autodetect modconf block keyboard encrypt lvm2 filesystems fsck)/g' /etc/mkinitcpio.conf
 cat /etc/mkinitcpio.conf
 
-mkinitcpio -p linux
+mkinitcpio -p linux-lts
 bootctl --path=/boot/ install
 
 echo "
@@ -113,13 +96,10 @@ cat /boot/loader/loader.conf
 
 DISK_ID=$(blkid /dev/nvme0n1p2 | awk '{print $2}' | sed -r -e 's/(UUID=")(.*?)"/\2/g')
 
-echo "install G14 kernel"
-pacman -Sy --noconfirm --needed linux-g14 linux-g14-headers
-
 echo "
 title ${GRUB_TITLE}
-linux /vmlinuz-linux-g14
-initrd /initramfs-linux-g14.img
+linux /vmlinuz-linux-lts
+initrd /initramfs-linux-lts.img
 options cryptdevice=UUID=${DISK_ID}:volume root=/dev/mapper/${USERNAME}-ROOT quiet rw
 " > /boot/loader/entries/arch.conf
 
