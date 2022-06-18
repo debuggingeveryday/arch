@@ -1,11 +1,11 @@
 #!/bin/bash
 
 checkline() {
-$1
-read -p "continue?" confirmation
-if [[ "$confirmation" != "y" ]]; then
-exit 0
-fi
+	$1
+	read -p "continue?" confirmation
+	if [[ "$confirmation" != "y" ]]; then
+		exit 0
+	fi
 }
 
 source ./settings.conf
@@ -33,36 +33,6 @@ checkline ""
 
 # ---------------- DEBUG AREA ------------------ #
 
-# ---------- G14 kernel ---------- #
-
-# @@@ #
-
-# echo "[Unit]
-# Description=Set the battery charge threshold
-# After=multi-user.target
-# StartLimitBurst=0
-
-# [Service]
-# Type=oneshot
-# Restart=on-failure
-# ExecStart=/bin/bash -c 'echo 60 > /sys/class/power_supply/BAT1/charge_control_end_threshold'
-
-# [Install]
-# WantedBy=multi-user.target" >> /etc/systemd/system/battery-charge-threshold.service
-
-# pacman -Syu
-
-# pacman -Sy --noconfirm --needed asusctl supergfxctl linux-g14 linux-g14-headers
-
-# systemctl enable supergfxd
-# systemctl enable power-profiles-daemon.service
-# systemctl --user enable asus-notify.service
-# systemctl enable battery-charge-threshold.service
-
-# @@@ #
-
-# ---------- G14 kernel ---------- #
-
 # ----------- RUN SERVICES -------------- #
 
 # @@@ #
@@ -72,10 +42,10 @@ checkline ""
 # @@@ #
 
 if [ "$DESKTOP" == "KDE" ]; then
-echo "SDDM service"
-# @@@ #
-# systemctl enable sddm.service
-# @@@ #
+	echo "SDDM service"
+	# @@@ #
+	# systemctl enable sddm.service
+	# @@@ #
 fi
 
 # @@@ #
@@ -123,9 +93,9 @@ cat /boot/loader/entries/arch.conf
 # ---------- ENCRYPT SET-UP ---------- #
 
 elif [ "$BOOT_TYPE" == "LEGACY" ]; then
-    mkdir /mnt/boot
-    mount ${NEW_DISK}1 /boot
-    swapon ${NEW_DISK}2
-    grub-install --boot-directory=/boot ${DISK}
-    grub-mkconfig -o /boot/grub/grub.cfg
+	mkdir /mnt/boot
+	mount ${NEW_DISK}1 /boot
+	swapon ${NEW_DISK}2
+	grub-install --boot-directory=/boot ${DISK}
+	grub-mkconfig -o /boot/grub/grub.cfg
 fi
