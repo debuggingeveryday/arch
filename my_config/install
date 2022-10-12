@@ -1,38 +1,10 @@
-#-------------------------------- #
-#               ZRAM              #
-# ------------------------------- #
+#!/bin/bash
 
-PASSWORD=12345
+git clone https://aur.archlinux.org/skypeforlinux-stable-bin.git && ./skypeforlinux makepkg -si
+git clone https://aur.archlinux.org/visual-studio-code-bin.git && ./visual-studio-code-bin makepkg -si
+git clone https://aur.archlinux.org/brave-bin.git && ./brave-bin makepkg -si
+git clone https://aur.archlinux.org/nohang.git && ./nohang makepkg -si
+git clone https://aur.archlinux.org/gitkraken.git && ./gitkraken makepkg -si
 
-echo "
-[Unit]
-Description=zRam block devices swapping
-
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/bash -c "modprobe zram && echo lz4 > /sys/block/zram0/comp_algorithm && echo 4G > /sys/block/zram0/disksize && mkswap --label zram0 /dev/zram0 && swapon --priority 100 /dev/zram0"
-ExecStop=/usr/bin/bash -c "swapoff /dev/zram0 && rmmod zram"
-RemainAfterExit=yes
-
-[Install]
-WantedBy=multi-user.target
-" > /etc/systemd/system/zram-swap.service
-
-# BATTERY THRESHOLD
-
-echo "
-[Unit]
-Description=Set the battery charge threshold
-After=multi-user.target
-StartLimitBurst=0
-
-[Service]
-Type=oneshot
-Restart=on-failure
-ExecStart=/bin/bash -c 'echo 60 > /sys/class/power_supply/BAT1/charge_control_end_threshold'
-
-[Install]
-WantedBy=multi-user.target" > /etc/systemd/system/battery-charge-threshold.service
-
-echo "$PASSWORD" | sudo -S systemctl enable --now zram-swap.service
-echo "$PASSWORD" | sudo -S systemctl enable --now battery-charge-threshold.service
+pacman -S docker docker-compose
+systemctl enable docker.service
