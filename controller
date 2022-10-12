@@ -214,11 +214,15 @@ fi
 pvcreate /dev/mapper/${STORAGE_NAME}
 vgcreate ${VOLGRP} /dev/mapper/${STORAGE_NAME}
 
-if [[  $TOTAL_RAM -gt 8000000 ]]; then
-lvcreate -L2G ${VOLGRP} -n SWAP
-mkswap /dev/mapper/${VOLGRP}-SWAP
-swapon /dev/mapper/${VOLGRP}-SWAP
-fi
+# /* Will remove soon
+
+# if [[  $TOTAL_RAM -gt 8000000 ]]; then
+# lvcreate -L2G ${VOLGRP} -n SWAP
+# mkswap /dev/mapper/${VOLGRP}-SWAP
+# swapon /dev/mapper/${VOLGRP}-SWAP
+# fi
+
+# */
 
 lvcreate -l 100%FREE ${VOLGRP} -n ROOT
 mkfs.ext4 /dev/mapper/${VOLGRP}-ROOT
@@ -338,4 +342,45 @@ follow_up () {
     boot_disk="/dev/${DISK_DRIVE}${DISK_PREFIX}1"
     $disk_id=$(blkid | grep "${boot_disk}" | cut -d' ' -f2 | cut -d'=' -f2 | sed -e 's/"//g')
     sed -i "$!N;s/\(#\s*${boot_disk}\n\)\(UUID=\)\(\w*\W*\w*\)/\1\2${disk_id}/;P;D" /etc/fstab
+}
+
+battery_threshold () {
+# BATTERY THRESHOLD
+
+echo "
+[Unit]
+Description=Set the battery charge threshold
+After=multi-user.target
+StartLimitBurst=0
+
+[Service]
+Type=oneshot
+Restart=on-failure
+ExecStart=/bin/bash -c 'echo 60 > /sys/class/power_supply/BAT1/charge_control_end_threshold'
+
+[Install]
+WantedBy=multi-user.target" > /etc/systemd/system/battery-charge-threshold.service
+
+echo "$PASSWORD" | sudo -S systemctl enable --now battery-charge-threshold.service
+}
+
+zram () {
+# ZRAM
+
+echo "
+[Unit]
+Description=zRam block devices swapping
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/bash -c "modprobe zram && echo lz4 > /sys/block/zram0/comp_algorithm && echo 4G > /sys/block/zram0/disksize && mkswap --label zram0 /dev/zram0 && swapon --priority 100 /dev/zram0"
+ExecStop=/usr/bin/bash -c "swapoff /dev/zram0 && rmmod zram"
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+" > /etc/systemd/system/zram-swap.service
+
+echo "$PASSWORD" | sudo -S systemctl enable --now zram-swap.service
+
 }

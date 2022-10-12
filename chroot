@@ -39,6 +39,18 @@ follow_up
 post_review
 # -- pause -- #
 
+battery_threshold
+
+# -- pause -- #
+post_review
+# -- pause -- #
+
+zram
+
+# -- pause -- #
+post_review
+# -- pause -- #
+
 
 # ------------------------------------------------------------------- #
 #                           CLEANING FILES                            #
