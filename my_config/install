@@ -2,7 +2,7 @@
 
 main_path=${PWD}
 
-git clone https://aur.archlinux.org/skypeforlinux-stable-bin.git && cd ./skypeforlinux && makepkg -si && cd $main_path
+git clone https://aur.archlinux.org/skypeforlinux-stable-bin.git && cd ./skypeforlinux-stable-bin && makepkg -si && cd $main_path
 git clone https://aur.archlinux.org/visual-studio-code-bin.git && cd ./visual-studio-code-bin && makepkg -si && cd $main_path
 git clone https://aur.archlinux.org/brave-bin.git && cd ./brave-bin && makepkg -si && cd $main_path
 git clone https://aur.archlinux.org/nohang.git && cd ./nohang && makepkg -si && cd $main_path
