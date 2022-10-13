@@ -1,10 +1,12 @@
 #!/bin/bash
 
-git clone https://aur.archlinux.org/skypeforlinux-stable-bin.git && ./skypeforlinux makepkg -si
-git clone https://aur.archlinux.org/visual-studio-code-bin.git && ./visual-studio-code-bin makepkg -si
-git clone https://aur.archlinux.org/brave-bin.git && ./brave-bin makepkg -si
-git clone https://aur.archlinux.org/nohang.git && ./nohang makepkg -si
-git clone https://aur.archlinux.org/gitkraken.git && ./gitkraken makepkg -si
+main_path=${PWD}
+
+git clone https://aur.archlinux.org/skypeforlinux-stable-bin.git && cd ./skypeforlinux && makepkg -si && cd $main_path
+git clone https://aur.archlinux.org/visual-studio-code-bin.git && cd ./visual-studio-code-bin && makepkg -si && cd $main_path
+git clone https://aur.archlinux.org/brave-bin.git && cd ./brave-bin && makepkg -si && cd $main_path
+git clone https://aur.archlinux.org/nohang.git && cd ./nohang && makepkg -si && cd $main_path
+git clone https://aur.archlinux.org/gitkraken.git && cd ./gitkraken && makepkg -si && cd $main_path
 
 pacman -S docker docker-compose
 systemctl enable docker.service
