@@ -8,5 +8,5 @@ git clone https://aur.archlinux.org/brave-bin.git && cd ./brave-bin && makepkg -
 git clone https://aur.archlinux.org/nohang.git && cd ./nohang && makepkg -si && cd $main_path
 git clone https://aur.archlinux.org/gitkraken.git && cd ./gitkraken && makepkg -si && cd $main_path
 
-pacman -S docker docker-compose
+pacman -Sy docker docker-compose
 systemctl enable docker.service
