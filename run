@@ -30,6 +30,12 @@ install_packages_part_1
 post_review
 # -- pause -- #
 
+install_gpu_driver
+
+# -- pause -- #
+post_review
+# -- pause -- #
+
 install_packages_part_2
 
 # -- pause -- #

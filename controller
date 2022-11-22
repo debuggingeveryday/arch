@@ -1,15 +1,21 @@
 # ------------------------------------------------------------------- #
-#                               CONSTANTS                             #
+#                                                                     #
+#                             CONSTANTS                               #
+#                                                                     #
 # ------------------------------------------------------------------- #
 
 DESKTOP_LIST=('KDE' 'I3WM')
 DISK_LIST=$(lsblk -n --output TYPE,KNAME,SIZE | awk '$1=="disk"{print "/dev/"$2}')
 
 # ------------------------------------------------------------------- #
+#                                                                     #
 #                               DEBUGGER                              #
+#                                                                     #
 # ------------------------------------------------------------------- #
 
 PAUSE=false
+
+# ------------------------------ VERBOSE ---------------------------- #
 
 check_line () {
 $1
@@ -29,7 +35,9 @@ fi
 }
 
 # ------------------------------------------------------------------- #
-#                             SET-UP CONSTANT                         #
+#                                                                     #
+#                         SET-UP CONSTANT                             #
+#                                                                     #
 # ------------------------------------------------------------------- #
 
 clear_constant () {
@@ -45,8 +53,10 @@ echo "$1=$2" >> constants.conf
 fi
 }
 
+# ------------------------- GET CPU INFO --------------------------- #
+
 get_system_variables () {
-# [BEGIN]-GET CPU TOTAL #
+
 proc_type=$(lscpu)
 if grep -E "GenuineIntel" <<< ${proc_type}; then
 echo "Installing Intel microcode"
@@ -58,9 +68,9 @@ fi
 
 update_constant "CPU_TYPE" "$cpu_type"
 
-# [END]-GET CPU TOTAL #
 
-# [BEGIN]-GET GPU #
+# ------------------------- GET GPU INFO ---------------------------- #
+
 if grep -E "NVIDIA|GeForce" <<< $(lspci); then
 gpu_type="NVIDIA"
 elif lspci | grep 'VGA' | grep -E "Radeon|AMD"; then
@@ -74,14 +84,15 @@ gpu_type="--"
 fi
 
 update_constant "GPU_TYPE" "$gpu_type"
-# [BEGIN]-GET GPU #
 
-# [BEGIN]-GET RAM TOTAL #
+# ------------------------- GET RAM TOTAL --------------------------- #
+
 total_ram=$(cat /proc/meminfo | grep MemTotal | awk '$1=="MemTotal:"{print $2}')
 update_constant "TOTAL_RAM" "${total_ram}"
-# [END]-GET RAM TOTAL #
 
-# [BEGIN]-GET BOOT_TYPE #
+
+# ------------------------- GET BOOT TYPE --------------------------- #
+
 if [[ -d "/sys/firmware/efi" ]]; then
 boot_type="EFI"
 else
@@ -89,13 +100,13 @@ boot_type="LEGACY"
 fi
 
 update_constant "BOOT_TYPE" "$boot_type"
-# [END]-GET BOOT_TYPE #
 
 }
 
+# ------------------------- GET VARIABLES --------------------------- #
+
 get_users_variables () {
 
-# [BEGIN]-GET BOOT_TYPE #
 declare -a disk=()
 declare -i index=0
 
@@ -116,8 +127,9 @@ read -p "HOST_NAME: " host_name && update_constant "HOST_NAME" "$host_name"
 read -p "USERNAME: " username && update_constant "USERNAME" "$username"
 read -sp "PASSWORD: " password && update_constant "PASSWORD" "$password"
 
-# [END]-GET BOOT_TYPE #
 }
+
+# ---------------------- GET DESKTOP VARIABLES ---------------------- #
 
 get_desktop_variables () {
 
@@ -133,7 +145,8 @@ read -p "CHOOSE DESKTOP ENVIRONMENT: " desktop_environment && update_constant "D
 }
 
 load_default_contants () {
-# [BEGIN]-GET BOOT_TYPE #
+# -------------------- FOR DEBUGGING VARIABLES --------------------- #
+
 declare -a disk=()
 declare -i index=0
 
@@ -153,7 +166,6 @@ update_constant "PASSWORD" "12345"
 update_constant "BOOT_TITLE" "boot_test"
 # update_constant "DISK_DRIVE" "${disk[0]}"
 
-# [BEGIN]-GET BOOT_TYPE #
 declare -a disk=()
 declare -i index=0
 
@@ -174,10 +186,16 @@ read -p "CHOOSE DISK_DRIVE: " disk_choose && update_constant "DISK_DRIVE" "${dis
 
 
 # ------------------------------------------------------------------- #
+#                                                                     #
 #                             INSTALLATION                            #
+#                                                                     #
 # ------------------------------------------------------------------- #
 
+# -------------------- load configurations -------------------------- #
+
 [[ -f "constants.conf" ]] && source ./constants.conf
+
+# ---------------------- CONFIG DATES ---------------------- #
 
 set_date () {
 timedatectl set-ntp true
@@ -186,6 +204,8 @@ timedatectl status
 
 STORAGE_NAME=shingha
 VOLGRP=scrubs
+
+# ---------------------- DISK PARTITION ---------------------- #
 
 disk_partition () {
 new_disk="/dev/${DISK_DRIVE}${DISK_PREFIX}"
@@ -228,12 +248,16 @@ mount ${new_disk}1 /mnt/boot
 
 }
 
+# ---------------------- INSTALL KERNEL ---------------------- #
+
 install_primary_setup () {
 pacstrap -i /mnt --needed --noconfirm base base-devel linux-lts linux-lts-headers linux-firmware archlinux-keyring grub
 [[ "$BOOT_TYPE" == "EFI" ]] && pacstrap -i /mnt --needed --noconfirm efibootmgr
 pacstrap -i /mnt --needed --noconfirm lvm2
 genfstab -U -p /mnt >> /mnt/etc/fstab
 }
+
+# ---------------------- DESKTOP ENVIRONMENT AND LOGIN ---------------------- #
 
 install_packages_part_1 () {
 pacstrap -i /mnt --needed --noconfirm iwd dhcpcd networkmanager
@@ -243,11 +267,17 @@ pacstrap -i /mnt --needed --noconfirm sddm
 elif [ "$DESKTOP" == "I3WM" ]; then
 pacstrap -i /mnt --needed --noconfirm xorg i3 dmenu lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings
 fi
+}
 
+# ---------------------- INSTALL GPU DRIVER ---------------------- #
+
+install_gpu_driver () {
 if [ "$GPU_TYPE" == "NVIDIA" ]; then
 pacstrap -i /mnt --needed --noconfirm cuda lib32-libvdpau lib32-nvidia-utils lib32-opencl-nvidia libvdpau libxnvctrl nvidia-settings nvidia-utils opencl-nvidia nvidia-lts
 fi
 }
+
+# ---------------------- TIMEZONE ---------------------- #
 
 modify_config () {
 sed -i 's/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g' /mnt/etc/locale.gen
@@ -271,10 +301,12 @@ sed -i "$!N;s/\(\[multilib]\n\)#\(Include\)/\1\2/;P;D" /mnt/etc/pacman.conf
 sed -r -i 's/(HOOKS=)\((.*?)\)/\1(base udev autodetect modconf block keyboard encrypt lvm2 filesystems fsck)/g' /mnt/etc/mkinitcpio.conf
 }
 
+# ---------------------- TIMEZONE ---------------------- #
+
 set_timezone () {
 locale-gen
 locale > /etc/locale.conf
-# hwclock --systohc
+hwclock --systohc
 }
 
 set_user () {
@@ -298,15 +330,20 @@ if [ "$DESKTOP" == "KDE" ]; then
 # important apps
 pacstrap -i /mnt --noconfirm kwrite ark dolphin kwallet konsole latte-dock
 
-# bluetooth
-pacstrap -i /mnt --noconfirm pulseaudio-alsa pulseaudio-bluetooth bluez-utils bluez
-
 # fix sound and wifi applet
 pacstrap -i /mnt --noconfirm plasma-pa plasma-nm
 
 # for vscode to access login
 pacstrap -i /mnt --noconfirm gnome-keyring libsecret
+
+# for sound
+pacstrap -i /mnt --noconfirm pulseaudio-alsa
 fi
+
+# TODO: make condition if bluetooth exist
+# bluetooth
+# pacstrap -i /mnt --noconfirm pulseaudio-bluetooth bluez-utils bluez
+
 }
 
 enable_service () {
