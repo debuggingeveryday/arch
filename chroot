@@ -1,3 +1,5 @@
+set -e
+
 [[ -f "constants.conf" ]] && source ./constants.conf || exit 0
 [[ -f "controller" ]] && source ./controller || exit 0
 
