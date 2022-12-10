@@ -352,7 +352,8 @@ systemctl enable dhcpcd
 systemctl enable iwd.service
 [[ "$DESKTOP" == "KDE" ]] && systemctl enable sddm.service
 [[ "$DESKTOP" == "I3WM" ]] && systemctl enable lightdm.service
-systemctl enable bluetooth
+
+[[ grep -E "Blue" <<< $(dmesg) && pacman -Qs bluez ]] && systemctl enable bluetooth
 }
 
 grub_install () {
