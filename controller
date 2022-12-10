@@ -261,7 +261,7 @@ genfstab -U -p /mnt >> /mnt/etc/fstab
 
 install_packages_part_1 () {
 pacstrap -i /mnt --needed --noconfirm dhcpcd networkmanager
-[[ grep -E 'Wireless' <<< $(lspci -k) ]]  && pacstrap -i /mnt --needed --noconfirm iwd
+[[ grep -E 'Wireless' <<< $(lspci -k) ]] && pacstrap -i /mnt --needed --noconfirm iwd
 if [ "$DESKTOP" == "KDE" ]; then
 pacstrap -i /mnt --needed --noconfirm xorg plasma-desktop plasma-wayland-session
 pacstrap -i /mnt --needed --noconfirm sddm
