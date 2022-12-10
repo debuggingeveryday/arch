@@ -19,7 +19,8 @@ echo "
 beta
 "
 
-read -p "INSTALL_TYPE: " select_install_type && update_constant "INSTALL_TYPE" "${install_type_list[select_install_type]}" install_type="${install_type_list[select_install_type]}"
+read -p "INSTALL_TYPE: " select_install_type && update_constant "INSTALL_TYPE" "${install_type_list[select_install_type]}"
+install_type="${install_type_list[select_install_type]}"
 [[ -f "constants.conf" ]] && source ./constants.conf
 get_system_variables
 [[ "$install_type" == "DEBUG" ]] && load_default_contants
