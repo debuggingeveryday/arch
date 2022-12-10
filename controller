@@ -210,7 +210,7 @@ VOLGRP=scrubs
 disk_partition () {
 new_disk="/dev/${DISK_DRIVE}${DISK_PREFIX}"
 
-umount -A --recursive /mnt
+umount -A --recursive /mnt && "umount" || "no mounted found"
 swapoff -a
 wipefs --all --force /dev/${DISK_DRIVE}
 sgdisk -Z /dev/${DISK_DRIVE}
