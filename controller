@@ -320,10 +320,7 @@ groups $USERNAME
 }
 
 install_packages_part_2 () {
-pacman -Syu --noconfirm --needed
-pacstrap -i /mnt --noconfirm --needed bzip2 p7zip unrar
-pacstrap -i /mnt --noconfirm --needed git
-pacstrap -i /mnt --noconfirm --needed firefox
+pacstrap -i /mnt --noconfirm --needed bzip2 p7zip git firefox
 # pacstrap -i /mnt --noconfirm --needed gimp
 
 if [ "$DESKTOP" == "KDE" ]; then
