@@ -320,6 +320,9 @@ groups $USERNAME
 }
 
 install_packages_part_2 () {
+set +e
+# TODO: fix this "error: Partition / too full"
+
 pacstrap -i /mnt --noconfirm --needed bzip2 p7zip git firefox
 # pacstrap -i /mnt --noconfirm --needed gimp
 
@@ -340,7 +343,7 @@ fi
 # TODO: make condition if bluetooth exist
 # bluetooth
 # pacstrap -i /mnt --noconfirm pulseaudio-bluetooth bluez-utils bluez
-
+set -e
 }
 
 enable_service () {
