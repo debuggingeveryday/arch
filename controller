@@ -350,10 +350,10 @@ set -e
 enable_service () {
 systemctl enable NetworkManager
 systemctl enable dhcpcd
-[[ $(grep -E 'Wireless' <<< 'lspci -k') && $(pacman -Qs iwd) ]] && systemctl enable iwd.service
+[[ $(lspci -k | grep 'Wireless') && $(pacman -Qs iwd) ]] && systemctl enable iwd.service || echo "no wifi"
 [[ "$DESKTOP" == "KDE" ]] && systemctl enable sddm.service
 [[ "$DESKTOP" == "I3WM" ]] && systemctl enable lightdm.service
-[[ $(grep -E "Blue" <<< dmesg) && $(pacman -Qs bluez) ]] && systemctl enable bluetooth
+[[ $(grep -E "Blue" <<< dmesg) && $(pacman -Qs bluez) ]] && systemctl enable bluetooth || echo "no bluetooth"
 }
 
 grub_install () {
