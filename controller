@@ -261,7 +261,7 @@ genfstab -U -p /mnt >> /mnt/etc/fstab
 
 install_packages_part_1 () {
 pacstrap -i /mnt --needed --noconfirm dhcpcd networkmanager
-[[ grep -E 'Wireless' <<< $(lspci -k) ]] && pacstrap -i /mnt --needed --noconfirm iwd
+[[ $(lspci -k | grep -E 'Wireless') ]] && pacstrap -i /mnt --needed --noconfirm iwd
 if [ "$DESKTOP" == "KDE" ]; then
 pacstrap -i /mnt --needed --noconfirm xorg plasma-desktop plasma-wayland-session
 pacstrap -i /mnt --needed --noconfirm sddm
@@ -350,7 +350,7 @@ set -e
 enable_service () {
 systemctl enable NetworkManager
 systemctl enable dhcpcd
-[[ grep -E 'Wireless' <<< $(lspci -k) && pacman -Qs iwd ]] && systemctl enable iwd.service
+[[ $(lspci -k | grep -E 'Wireless') && $(pacman -Qs iwd) ]] && systemctl enable iwd.service
 [[ "$DESKTOP" == "KDE" ]] && systemctl enable sddm.service
 [[ "$DESKTOP" == "I3WM" ]] && systemctl enable lightdm.service
 [[ grep -E "Blue" <<< $(dmesg) && pacman -Qs bluez ]] && systemctl enable bluetooth
