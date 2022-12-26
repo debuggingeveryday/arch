@@ -57,6 +57,12 @@ fi
 
 get_system_variables () {
 
+bluetooth=$([[ dmesg | grep -i bluetooth ]])
+
+if [[ $bluetooth ]]; then
+update_constant "HAS_BLUETOOTH" true
+fi
+
 proc_type=$(lscpu)
 if grep -E "GenuineIntel" <<< ${proc_type}; then
 echo "Installing Intel microcode"
@@ -234,12 +240,6 @@ fi
 pvcreate /dev/mapper/${STORAGE_NAME}
 vgcreate ${VOLGRP} /dev/mapper/${STORAGE_NAME}
 
-#if [[  $TOTAL_RAM -gt 8000000 ]]; then
-#lvcreate -L2G ${VOLGRP} -n SWAP
-#mkswap /dev/mapper/${VOLGRP}-SWAP
-#swapon /dev/mapper/${VOLGRP}-SWAP
-#fi
-
 lvcreate -l 100%FREE ${VOLGRP} -n ROOT
 mkfs.ext4 /dev/mapper/${VOLGRP}-ROOT
 mount /dev/mapper/${VOLGRP}-ROOT /mnt
@@ -260,13 +260,18 @@ genfstab -U -p /mnt >> /mnt/etc/fstab
 # ---------------------- DESKTOP ENVIRONMENT AND LOGIN ---------------------- #
 
 install_packages_part_1 () {
-pacstrap -i /mnt --needed --noconfirm iwd dhcpcd networkmanager
+
+HAS_WIFI=$(lspci | grep Wireless)
+
+pacstrap -i /mnt --needed --noconfirm dhcpcd networkmanager
 if [ "$DESKTOP" == "KDE" ]; then
 pacstrap -i /mnt --needed --noconfirm xorg plasma-desktop plasma-wayland-session
 pacstrap -i /mnt --needed --noconfirm sddm
 elif [ "$DESKTOP" == "I3WM" ]; then
 pacstrap -i /mnt --needed --noconfirm xorg i3 dmenu lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings
 fi
+
+[[ $HAS_WIFI ]] && pacstrap -i /mnt --needed --noconfirm iwd
 }
 
 # ---------------------- INSTALL GPU DRIVER ---------------------- #
@@ -299,6 +304,28 @@ sed -i "s/#\[multilib]/[multilib]/" /mnt/etc/pacman.conf
 sed -i "$!N;s/\(\[multilib]\n\)#\(Include\)/\1\2/;P;D" /mnt/etc/pacman.conf
 
 sed -r -i 's/(HOOKS=)\((.*?)\)/\1(base udev autodetect modconf block keyboard encrypt lvm2 filesystems fsck)/g' /mnt/etc/mkinitcpio.conf
+
+# ZRAM
+
+ram=$(((total_ram / 1000)/2))
+[[ $ram -gt 0 && $ram -lt 3500 ]] && swap_size="2G"
+[[ $ram -gt 3500 && $ram -lt 7500 ]] && swap_size="4G"
+[[ $ram -gt 7500 && $ram -lt 15500 ]] && swap_size="8G"
+
+echo "
+[Unit]
+Description=zRam block devices swapping
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/bash -c "modprobe zram && echo lz4 > /sys/block/zram0/comp_algorithm && echo $swap_size > /sys/block/zram0/disksize && mkswap --label zram0 /dev/zram0 && swapon --priority 100 /dev/zram0"
+ExecStop=/usr/bin/bash -c "swapoff /dev/zram0 && rmmod zram"
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+" > /mnt/etc/systemd/system/zram-swap.service
+
 }
 
 # ---------------------- TIMEZONE ---------------------- #
@@ -338,21 +365,21 @@ pacstrap -i /mnt --noconfirm gnome-keyring libsecret
 
 # for sound
 pacstrap -i /mnt --noconfirm pulseaudio-alsa
+
 fi
 
-# TODO: make condition if bluetooth exist
-# bluetooth
-# pacstrap -i /mnt --noconfirm pulseaudio-bluetooth bluez-utils bluez
+[[ $HAS_BLUETOOTH ]] &&  pacstrap -i /mnt --noconfirm pulseaudio-bluetooth bluez-utils bluez
 
 }
 
 enable_service () {
 systemctl enable NetworkManager
 systemctl enable dhcpcd
-systemctl enable iwd.service
+[[ $HAS_WIFI ]] && systemctl enable iwd.service
 [[ "$DESKTOP" == "KDE" ]] && systemctl enable sddm.service
 [[ "$DESKTOP" == "I3WM" ]] && systemctl enable lightdm.service
-systemctl enable bluetooth
+[[ $HAS_BLUETOOTH ]] && systemctl enable bluetooth
+systemctl enable zram-swap.service
 }
 
 grub_install () {
