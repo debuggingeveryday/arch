@@ -251,10 +251,12 @@ mount ${new_disk}1 /mnt/boot
 # ---------------------- INSTALL KERNEL ---------------------- #
 
 install_primary_setup () {
+set +e
 pacstrap -i /mnt --needed --noconfirm base base-devel linux-lts linux-lts-headers linux-firmware archlinux-keyring grub
 [[ "$BOOT_TYPE" == "EFI" ]] && pacstrap -i /mnt --needed --noconfirm efibootmgr
 pacstrap -i /mnt --needed --noconfirm lvm2
 genfstab -U -p /mnt >> /mnt/etc/fstab
+set -e
 }
 
 # ---------------------- DESKTOP ENVIRONMENT AND LOGIN ---------------------- #
@@ -370,6 +372,7 @@ fi
 
 [[ $HAS_BLUETOOTH ]] &&  pacstrap -i /mnt --noconfirm pulseaudio-bluetooth bluez-utils bluez
 
+set -e
 }
 
 enable_service () {
