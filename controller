@@ -57,10 +57,10 @@ fi
 
 get_system_variables () {
 
-bluetooth=$([[ dmesg | grep -i bluetooth ]])
+bluetooth=$(dmesg | grep -i bluetooth)
 
 if [[ $bluetooth ]]; then
-update_constant "HAS_BLUETOOTH" true
+update_constant "has_bluetooth" true
 fi
 
 proc_type=$(lscpu)
@@ -263,7 +263,7 @@ set -e
 
 install_packages_part_1 () {
 
-HAS_WIFI=$(lspci | grep Wireless)
+has_wifi=$(lspci | grep Wireless)
 
 pacstrap -i /mnt --needed --noconfirm dhcpcd networkmanager
 if [ "$DESKTOP" == "KDE" ]; then
@@ -273,7 +273,7 @@ elif [ "$DESKTOP" == "I3WM" ]; then
 pacstrap -i /mnt --needed --noconfirm xorg i3 dmenu lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings
 fi
 
-[[ $HAS_WIFI ]] && pacstrap -i /mnt --needed --noconfirm iwd
+[[ $has_wifi ]] && pacstrap -i /mnt --needed --noconfirm iwd
 }
 
 # ---------------------- INSTALL GPU DRIVER ---------------------- #
@@ -370,7 +370,7 @@ pacstrap -i /mnt --noconfirm pulseaudio-alsa
 
 fi
 
-[[ $HAS_BLUETOOTH ]] &&  pacstrap -i /mnt --noconfirm pulseaudio-bluetooth bluez-utils bluez
+[[ $has_bluetooth ]] &&  pacstrap -i /mnt --noconfirm pulseaudio-bluetooth bluez-utils bluez
 
 set -e
 }
@@ -378,10 +378,10 @@ set -e
 enable_service () {
 systemctl enable NetworkManager
 systemctl enable dhcpcd
-[[ $HAS_WIFI ]] && systemctl enable iwd.service
+[[ $has_wifi ]] && systemctl enable iwd.service
 [[ "$DESKTOP" == "KDE" ]] && systemctl enable sddm.service
 [[ "$DESKTOP" == "I3WM" ]] && systemctl enable lightdm.service
-[[ $HAS_BLUETOOTH ]] && systemctl enable bluetooth
+[[ $has_bluetooth ]] && systemctl enable bluetooth
 systemctl enable zram-swap.service
 }
 
