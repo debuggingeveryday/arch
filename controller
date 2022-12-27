@@ -274,9 +274,11 @@ set -e
 # ---------------------- INSTALL GPU DRIVER ---------------------- #
 
 install_gpu_driver () {
+set +e
 if [ "$GPU_TYPE" == "NVIDIA" ]; then
 pacstrap -i /mnt --needed --noconfirm cuda lib32-libvdpau lib32-nvidia-utils lib32-opencl-nvidia libvdpau libxnvctrl nvidia-settings nvidia-utils opencl-nvidia nvidia-lts
 fi
+set -e
 }
 
 # ---------------------- TIMEZONE ---------------------- #
