@@ -59,13 +59,8 @@ get_system_variables () {
 check_bluetooth=$(dmesg | grep -i bluetooth)
 check_wifi=$(lspci | grep Wireless)
 
-if [[ $check_bluetooth ]]; then
-update_constant "HAS_BLUETOOTH" "YES"
-fi
-
-if [[ $check_wifi ]]; then
-update_constant "HAS_WIFI" "YES"
-fi
+[[ $check_bluetooth ]] && update_constant "HAS_BLUETOOTH" "YES"
+[[ $check_wifi ]] && update_constant "HAS_WIFI" "YES"
 
 proc_type=$(lscpu)
 if grep -E "GenuineIntel" <<< ${proc_type}; then
