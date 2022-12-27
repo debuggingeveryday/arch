@@ -56,10 +56,15 @@ fi
 # ------------------------- GET CPU INFO --------------------------- #
 
 get_system_variables () {
-bluetooth=$(dmesg | grep -i bluetooth)
+check_bluetooth=$(dmesg | grep -i bluetooth)
+check_wifi=$(lspci | grep Wireless)
 
-if [[ $bluetooth ]]; then
-update_constant "HAS_BLUETOOTH" "TRUE"
+if [[ $check_bluetooth ]]; then
+update_constant "HAS_BLUETOOTH" "YES"
+fi
+
+if [[ $check_wifi ]]; then
+update_constant "HAS_WIFI" "YES"
 fi
 
 proc_type=$(lscpu)
@@ -261,9 +266,6 @@ set -e
 # ---------------------- DESKTOP ENVIRONMENT AND LOGIN ---------------------- #
 
 install_packages_part_1 () {
-
-HAS_WIFI=$(lspci | grep Wireless)
-
 pacstrap -i /mnt --needed --noconfirm dhcpcd networkmanager
 if [ "$DESKTOP" == "KDE" ]; then
 pacstrap -i /mnt --needed --noconfirm xorg plasma-desktop plasma-wayland-session
@@ -272,7 +274,7 @@ elif [ "$DESKTOP" == "I3WM" ]; then
 pacstrap -i /mnt --needed --noconfirm xorg i3 dmenu lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings
 fi
 
-[[ $HAS_WIFI ]] && pacstrap -i /mnt --needed --noconfirm iwd
+[[ $HAS_WIFI == "YES" ]] && pacstrap -i /mnt --needed --noconfirm iwd
 }
 
 # ---------------------- INSTALL GPU DRIVER ---------------------- #
@@ -369,7 +371,7 @@ pacstrap -i /mnt --noconfirm pulseaudio-alsa
 
 fi
 
-[[ $HAS_BLUETOOTH ]] &&  pacstrap -i /mnt --noconfirm pulseaudio-bluetooth bluez-utils bluez
+[[ "$HAS_BLUETOOTH" == "YES" ]] &&  pacstrap -i /mnt --noconfirm pulseaudio-bluetooth bluez-utils bluez
 
 set -e
 }
@@ -377,10 +379,10 @@ set -e
 enable_service () {
 systemctl enable NetworkManager
 systemctl enable dhcpcd
-[[ $HAS_WIFI ]] && systemctl enable iwd.service
+[[ "$HAS_WIFI" == "YES" ]] && systemctl enable iwd.service
 [[ "$DESKTOP" == "KDE" ]] && systemctl enable sddm.service
 [[ "$DESKTOP" == "I3WM" ]] && systemctl enable lightdm.service
-[[ $HAS_BLUETOOTH ]] && systemctl enable bluetooth
+[[ "$HAS_BLUETOOTH" == "YES" ]] && systemctl enable bluetooth
 systemctl enable zram-swap.service
 }
 
