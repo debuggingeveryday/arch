@@ -56,11 +56,8 @@ fi
 # ------------------------- GET CPU INFO --------------------------- #
 
 get_system_variables () {
-check_bluetooth=$(grep -E "bluetooth" <<< $(dmesg))
-check_wifi=$(grep -E "Wireless" <<< $(lspci))
-
-[[ $check_bluetooth ]] && update_constant "HAS_BLUETOOTH" "YES"
-[[ $check_wifi ]] && update_constant "HAS_WIFI" "YES"
+[[ $(grep -E "bluetooth" <<< $(dmesg)) ]] && update_constant "HAS_BLUETOOTH" "YES"
+[[ $(grep -E "Wireless" <<< $(lspci)) ]] && update_constant "HAS_WIFI" "YES"
 
 proc_type=$(lscpu)
 if grep -E "GenuineIntel" <<< ${proc_type}; then
