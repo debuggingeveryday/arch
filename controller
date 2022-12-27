@@ -258,6 +258,7 @@ set -e
 # ---------------------- DESKTOP ENVIRONMENT AND LOGIN ---------------------- #
 
 install_packages_part_1 () {
+set +e
 pacstrap -i /mnt --needed --noconfirm dhcpcd networkmanager
 if [ "$DESKTOP" == "KDE" ]; then
 pacstrap -i /mnt --needed --noconfirm xorg plasma-desktop plasma-wayland-session
@@ -267,6 +268,7 @@ pacstrap -i /mnt --needed --noconfirm xorg i3 dmenu lightdm lightdm-gtk-greeter 
 fi
 
 [[ $HAS_WIFI == "YES" ]] && pacstrap -i /mnt --needed --noconfirm iwd
+set -e
 }
 
 # ---------------------- INSTALL GPU DRIVER ---------------------- #
