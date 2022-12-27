@@ -59,6 +59,8 @@ get_system_variables () {
 check_bluetooth=$(dmesg | grep -i bluetooth)
 check_wifi=$(lspci | grep Wireless)
 
+echo "test--------"
+
 [[ $check_bluetooth ]] && update_constant "HAS_BLUETOOTH" "YES"
 [[ $check_wifi ]] && update_constant "HAS_WIFI" "YES"
 
