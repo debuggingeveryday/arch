@@ -56,7 +56,7 @@ fi
 # ------------------------- GET CPU INFO --------------------------- #
 
 get_system_variables () {
-bluetooth=$(dmesg | grep -i "bluetooth")
+bluetooth=$((dmesg | grep -i "bluetooth"))
 
 if [[ $bluetooth ]]; then
 update_constant "HAS_BLUETOOTH" true
