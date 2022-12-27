@@ -56,10 +56,8 @@ fi
 # ------------------------- GET CPU INFO --------------------------- #
 
 get_system_variables () {
-check_bluetooth=$(dmesg | grep -i bluetooth)
-check_wifi=$(lspci | grep Wireless)
-
-echo "test--------"
+check_bluetooth=$(grep -E "bluetooth" <<< $(dmesg))
+check_wifi=$(grep -E "Wireless" <<< $(lspci))
 
 [[ $check_bluetooth ]] && update_constant "HAS_BLUETOOTH" "YES"
 [[ $check_wifi ]] && update_constant "HAS_WIFI" "YES"
