@@ -210,6 +210,9 @@ VOLGRP=scrubs
 # ---------------------- DISK PARTITION ---------------------- #
 
 disk_partition () {
+
+make_encrypt=false
+
 new_disk="/dev/${DISK_DRIVE}${DISK_PREFIX}"
 
 umount -A --recursive /mnt && echo "umount" || echo "cant umount no mounted found"
@@ -224,23 +227,33 @@ sgdisk -a 2048 -o /dev/${DISK_DRIVE}
 sgdisk -n 1::$disk_size --typecode=1:ef00 --change-name=1:'BOOT' /dev/${DISK_DRIVE} # EFI /dev/nvme0n1p1
 sgdisk -n 2::-0 --typecode=2:8e00 --change-name=2:'ROOT' /dev/${DISK_DRIVE} # FILE SYSTEM /dev/nvme0n1p3
 
-mkfs.fat -F32 ${new_disk}1
+echo -n "y" | mkfs.fat -F32 ${new_disk}1
+
+if [[ $make_encrypt == true ]]; then
 
 echo -n "${PASSWORD}" | cryptsetup -y -v luksFormat ${new_disk}2 -
 echo -n "${PASSWORD}" | cryptsetup open --type luks ${new_disk}2 ${STORAGE_NAME} -
 
-if [[ ! "/dev/mapper/${STORAGE_NAME}" ]]; then
-exit 0
-fi
+[[ ! "/dev/mapper/${STORAGE_NAME}" ]] && exit 0
 
 pvcreate /dev/mapper/${STORAGE_NAME}
 vgcreate ${VOLGRP} /dev/mapper/${STORAGE_NAME}
 
 lvcreate -l 100%FREE ${VOLGRP} -n ROOT
+
 mkfs.ext4 /dev/mapper/${VOLGRP}-ROOT
 mount /dev/mapper/${VOLGRP}-ROOT /mnt
 mkdir /mnt/boot
 mount ${new_disk}1 /mnt/boot
+
+else
+
+echo -n "y" | mkfs.ext4 ${new_disk}2
+mount ${new_disk}2 /mnt
+mkdir /mnt/boot
+mount ${new_disk}1 /mnt/boot
+
+fi
 
 }
 
@@ -248,9 +261,14 @@ mount ${new_disk}1 /mnt/boot
 
 install_primary_setup () {
 set +e
+make_encrypt=false
+
 pacstrap -i /mnt --needed --noconfirm base base-devel linux-lts linux-lts-headers linux-firmware archlinux-keyring grub
 [[ "$BOOT_TYPE" == "EFI" ]] && pacstrap -i /mnt --needed --noconfirm efibootmgr
+
+if [[ $make_encrypt == true ]]; then
 pacstrap -i /mnt --needed --noconfirm lvm2
+fi
 genfstab -U -p /mnt >> /mnt/etc/fstab
 set -e
 }
@@ -302,7 +320,10 @@ echo "$USERNAME ALL=(ALL) ALL" >> /mnt/etc/sudoers
 sed -i "s/#\[multilib]/[multilib]/" /mnt/etc/pacman.conf
 sed -i "$!N;s/\(\[multilib]\n\)#\(Include\)/\1\2/;P;D" /mnt/etc/pacman.conf
 
+make_encrypt=false
+if [[ $make_encrypt == true ]]; then
 sed -r -i 's/(HOOKS=)\((.*?)\)/\1(base udev autodetect modconf block keyboard encrypt lvm2 filesystems fsck)/g' /mnt/etc/mkinitcpio.conf
+fi
 
 # ZRAM
 
@@ -317,8 +338,8 @@ Description=zRam block devices swapping
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/bash -c "modprobe zram && echo lz4 > /sys/block/zram0/comp_algorithm && echo $swap_size > /sys/block/zram0/disksize && mkswap --label zram0 /dev/zram0 && swapon --priority 100 /dev/zram0"
-ExecStop=/usr/bin/bash -c "swapoff /dev/zram0 && rmmod zram"
+ExecStart=/usr/bin/bash -c 'modprobe zram && echo lz4 > /sys/block/zram0/comp_algorithm && echo $swap_size > /sys/block/zram0/disksize && mkswap --label zram0 /dev/zram0 && swapon --priority 100 /dev/zram0'
+ExecStop=/usr/bin/bash -c 'swapoff /dev/zram0 && rmmod zram'
 RemainAfterExit=yes
 
 [Install]
@@ -383,9 +404,12 @@ systemctl enable zram-swap.service
 }
 
 grub_install () {
+make_encrypt=false
+
 mkinitcpio -p linux-lts
 grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot
 
+if [[ $make_encrypt == true ]]; then
 STORAGE_NAME="shingha"
 VOLGRP="scrubs"
 new_disk="/dev/${DISK_DRIVE}${DISK_PREFIX}2"
@@ -393,13 +417,16 @@ disk_id=$(blkid | grep "${new_disk}" | cut -d' ' -f2 | cut -d'=' -f2 | sed -e 's
 tag="GRUB_CMDLINE_LINUX=\"\""
 value="GRUB_CMDLINE_LINUX=\"cryptdevice=UUID=$disk_id:$STORAGE_NAME root=\/dev\/mapper\/$VOLGRP-ROOT\""
 sed -i "s/$tag/$value/g" /etc/default/grub
+fi
 
 grub-mkconfig -o /boot/grub/grub.cfg
 }
 
 # TODO: re-construct
 follow_up () {
+if [[ $make_encrypt == true ]]; then
 boot_disk="\/dev\/${DISK_DRIVE}${DISK_PREFIX}1"
 disk_id=$(blkid | grep "${boot_disk}" | cut -d' ' -f2 | cut -d'=' -f2 | sed -e 's/"//g')
 sed -i "$!N;s/\(#\s*${boot_disk}\n\)\(UUID=\)\(\w*\W*\w*\)/\1\2${disk_id}/;P;D" /etc/fstab
+fi
 }
