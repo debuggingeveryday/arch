@@ -4,35 +4,13 @@
 #                                                                     #
 # ------------------------------------------------------------------- #
 
-DESKTOP_LIST=('KDE' 'I3WM')
-DISK_LIST=$(lsblk -n --output TYPE,KNAME,SIZE | awk '$1=="disk"{print "/dev/"$2}')
 
-# ------------------------------------------------------------------- #
-#                                                                     #
-#                               DEBUGGER                              #
-#                                                                     #
-# ------------------------------------------------------------------- #
-
+ENCRYPT_DRIVE=false
+KERNEL_PREFIX=""
 PAUSE=false
 
-# ------------------------------ VERBOSE ---------------------------- #
-
-check_line () {
-$1
-read -p "continue?" confirmation
-if [[ "$confirmation" != "y" ]]; then
-exit 0
-fi
-}
-
-post_review () {
-if [[ $PAUSE == true ]]; then
-read -p "Press any key to resume ..."
-else
-echo "-------------------------------------------------------------"
-# read -t 2 -p $'\n'"I am going to wait for 2 seconds only ..."$'\n'
-fi
-}
+DESKTOP_LIST=('KDE' 'I3WM')
+DISK_LIST=$(lsblk -n --output TYPE,KNAME,SIZE | awk '$1=="disk"{print "/dev/"$2}')
 
 # ------------------------------------------------------------------- #
 #                                                                     #
@@ -102,6 +80,8 @@ boot_type="LEGACY"
 fi
 
 update_constant "BOOT_TYPE" "$boot_type"
+
+if [[ ls /sys/class/power_supply ]]; && update_constant "HAS_BATTERY_THRESHOLD" "YES"
 
 }
 
@@ -186,7 +166,6 @@ read -p "CHOOSE DISK_DRIVE: " disk_choose && update_constant "DISK_DRIVE" "${dis
 
 }
 
-
 # ------------------------------------------------------------------- #
 #                                                                     #
 #                             INSTALLATION                            #
@@ -210,9 +189,6 @@ VOLGRP=scrubs
 # ---------------------- DISK PARTITION ---------------------- #
 
 disk_partition () {
-
-make_encrypt=false
-
 new_disk="/dev/${DISK_DRIVE}${DISK_PREFIX}"
 
 umount -A --recursive /mnt && echo "umount" || echo "cant umount no mounted found"
@@ -229,7 +205,7 @@ sgdisk -n 2::-0 --typecode=2:8e00 --change-name=2:'ROOT' /dev/${DISK_DRIVE} # FI
 
 echo -n "y" | mkfs.fat -F32 ${new_disk}1
 
-if [[ $make_encrypt == true ]]; then
+if [[ $ENCRYPT_DRIVE == true ]]; then
 
 echo -n "${PASSWORD}" | cryptsetup -y -v luksFormat ${new_disk}2 -
 echo -n "${PASSWORD}" | cryptsetup open --type luks ${new_disk}2 ${STORAGE_NAME} -
@@ -261,12 +237,17 @@ fi
 
 install_primary_setup () {
 set +e
-make_encrypt=false
 
-pacstrap -i /mnt --needed --noconfirm base base-devel linux-lts linux-lts-headers linux-firmware archlinux-keyring grub
+if [[ $KERNEL_PREFIX ]]; then
+pacstrap -i /mnt --needed --noconfirm linux-$KERNEL_PREFIX linux-$KERNEL_PREFIX-headers
+elif
+pacstrap -i /mnt --needed --noconfirm linux
+fi
+
+pacstrap -i /mnt --needed --noconfirm base base-devel linux-firmware archlinux-keyring grub
 [[ "$BOOT_TYPE" == "EFI" ]] && pacstrap -i /mnt --needed --noconfirm efibootmgr
 
-if [[ $make_encrypt == true ]]; then
+if [[ $ENCRYPT_DRIVE == true ]]; then
 pacstrap -i /mnt --needed --noconfirm lvm2
 fi
 genfstab -U -p /mnt >> /mnt/etc/fstab
@@ -320,8 +301,7 @@ echo "$USERNAME ALL=(ALL) ALL" >> /mnt/etc/sudoers
 sed -i "s/#\[multilib]/[multilib]/" /mnt/etc/pacman.conf
 sed -i "$!N;s/\(\[multilib]\n\)#\(Include\)/\1\2/;P;D" /mnt/etc/pacman.conf
 
-make_encrypt=false
-if [[ $make_encrypt == true ]]; then
+if [[ $ENCRYPT_DRIVE == true ]]; then
 sed -r -i 's/(HOOKS=)\((.*?)\)/\1(base udev autodetect modconf block keyboard encrypt lvm2 filesystems fsck)/g' /mnt/etc/mkinitcpio.conf
 fi
 
@@ -346,6 +326,22 @@ RemainAfterExit=yes
 WantedBy=multi-user.target
 " > /mnt/etc/systemd/system/zram-swap.service
 
+if [[ $HAS_BATTERY_THRESHOLD == "YES" ]]; then
+echo "
+[Unit]
+Description=Set the battery charge threshold
+After=multi-user.target
+StartLimitBurst=0
+
+[Service]
+Type=oneshot
+Restart=on-failure
+ExecStart=/bin/bash -c 'echo 60 > /sys/class/power_supply/BAT1/charge_control_end_threshold'
+
+[Install]
+WantedBy=multi-user.target
+" > /mnt/etc/systemd/battery-charge-threshold.service
+fi
 }
 
 # ---------------------- TIMEZONE ---------------------- #
@@ -396,20 +392,22 @@ set -e
 enable_service () {
 systemctl enable NetworkManager
 systemctl enable dhcpcd
+systemctl enable zram-swap.service
 [[ "$HAS_WIFI" == "YES" ]] && systemctl enable iwd.service
 [[ "$DESKTOP" == "KDE" ]] && systemctl enable sddm.service
 [[ "$DESKTOP" == "I3WM" ]] && systemctl enable lightdm.service
 [[ "$HAS_BLUETOOTH" == "YES" ]] && systemctl enable bluetooth
-systemctl enable zram-swap.service
+[[ "$HAS_BATTERY_THRESHOLD" == "YES" ]] && systemctl enable battery-charge-threshold.service
 }
 
 grub_install () {
-make_encrypt=false
+if [[ $ENCRYPT_DRIVE == true ]]; then
+[[ $KERNEL_PREFIX ]] && mkinitcpio -p linux-$KERNEL_PREFIX || mkinitcpio -p linux
+fi
 
-mkinitcpio -p linux-lts
 grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot
 
-if [[ $make_encrypt == true ]]; then
+if [[ $ENCRYPT_DRIVE == true ]]; then
 STORAGE_NAME="shingha"
 VOLGRP="scrubs"
 new_disk="/dev/${DISK_DRIVE}${DISK_PREFIX}2"
@@ -424,7 +422,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 
 # TODO: re-construct
 follow_up () {
-if [[ $make_encrypt == true ]]; then
+if [[ $ENCRYPT_DRIVE == true ]]; then
 boot_disk="\/dev\/${DISK_DRIVE}${DISK_PREFIX}1"
 disk_id=$(blkid | grep "${boot_disk}" | cut -d' ' -f2 | cut -d'=' -f2 | sed -e 's/"//g')
 sed -i "$!N;s/\(#\s*${boot_disk}\n\)\(UUID=\)\(\w*\W*\w*\)/\1\2${disk_id}/;P;D" /etc/fstab
