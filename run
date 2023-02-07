@@ -20,7 +20,6 @@ declare -a functions=(
 
 for function in ${functions[@]}; do
 ${function}
-post_review
 done
 
 # ------------------------------------------------------------------- #

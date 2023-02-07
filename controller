@@ -81,7 +81,7 @@ fi
 
 update_constant "BOOT_TYPE" "$boot_type"
 
-if [[ ls /sys/class/power_supply ]]; && update_constant "HAS_BATTERY_THRESHOLD" "YES"
+[[ -d "/sys/class/power_supply" ]] && update_constant "HAS_BATTERY_THRESHOLD" "YES"
 
 }
 
@@ -240,7 +240,7 @@ set +e
 
 if [[ $KERNEL_PREFIX ]]; then
 pacstrap -i /mnt --needed --noconfirm linux-$KERNEL_PREFIX linux-$KERNEL_PREFIX-headers
-elif
+else
 pacstrap -i /mnt --needed --noconfirm linux
 fi
 
