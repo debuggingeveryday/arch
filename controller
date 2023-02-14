@@ -35,10 +35,10 @@ fi
 
 get_system_variables () {
 system_manufacturer=$(dmidecode -s system-manufacturer)
-[[ "$system_manufacturer" == "innotek GmbH" ]] && update_constant "IS_VBOX" "YES" || echo "NOT VBOX"
+[[ "$system_manufacturer" == "innotek GmbH" ]] && update_constant "IS_VBOX" "YES" || echo "exit"
 
-[[ $(grep -E "bluetooth" <<< $(dmesg)) ]] && update_constant "HAS_BLUETOOTH" "YES" || echo "no bluetooth found"
-[[ $(grep -E "Wireless" <<< $(lspci)) ]] && update_constant "HAS_WIFI" "YES" || echo "no wifi found"
+[[ $(grep -E "bluetooth" <<< $(dmesg)) ]] && update_constant "HAS_BLUETOOTH" "YES" || echo "exit"
+[[ $(grep -E "Wireless" <<< $(lspci)) ]] && update_constant "HAS_WIFI" "YES" || echo "exit"
 
 proc_type=$(lscpu)
 if grep -E "GenuineIntel" <<< ${proc_type}; then
@@ -85,7 +85,7 @@ fi
 update_constant "BOOT_TYPE" "$boot_type"
 
 # TODO: filter add BAT0 BAT1 ...
-[[ -d "/sys/class/power_supply/BAT1" ]] && update_constant "HAS_BATTERY_THRESHOLD" "YES" || echo "no battery exist"
+[[ -d "/sys/class/power_supply/BAT1" ]] && update_constant "HAS_BATTERY_THRESHOLD" "YES" || echo "exit"
 
 }
 
@@ -371,7 +371,6 @@ groups $USERNAME
 }
 
 install_packages_part_2 () {
-set +e
 # TODO: fix this "error: Partition / too full"
 
 pacstrap -i /mnt --noconfirm --needed bzip2 p7zip git firefox
@@ -392,21 +391,19 @@ pacstrap -i /mnt --noconfirm pulseaudio-alsa
 
 fi
 
-[[ "$HAS_BLUETOOTH" == "YES" ]] &&  pacstrap -i /mnt --noconfirm pulseaudio-bluetooth bluez-utils bluez
-
-set -e
+[[ "$HAS_BLUETOOTH" == "YES" ]] &&  pacstrap -i /mnt --noconfirm pulseaudio-bluetooth bluez-utils bluez || echo "exit"
 }
 
 enable_service () {
 systemctl enable NetworkManager
 systemctl enable dhcpcd
-[[ "$HAS_WIFI" == "YES" ]] && systemctl enable iwd.service || echo "no wifi services"
+[[ "$HAS_WIFI" == "YES" ]] && systemctl enable iwd.service || echo "exit"
 [[ "$DESKTOP" == "KDE" ]] && systemctl enable sddm.service
 [[ "$DESKTOP" == "I3WM" ]] && systemctl enable lightdm.service
-[[ "$HAS_BLUETOOTH" == "YES" ]] && systemctl enable bluetooth || echo "no bluetooth services"
+[[ "$HAS_BLUETOOTH" == "YES" ]] && systemctl enable bluetooth || echo "exit"
 
 if [[ "$IS_VBOX" != "YES" ]]; then
-[[ "$HAS_BATTERY_THRESHOLD" == "YES" ]] && systemctl enable battery-charge-threshold.service || echo "no battery service"
+[[ "$HAS_BATTERY_THRESHOLD" == "YES" ]] && systemctl enable battery-charge-threshold.service || echo "exit"
 systemctl enable zram-swap.service
 fi
 }
