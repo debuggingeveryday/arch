@@ -209,7 +209,7 @@ sgdisk -n 2::-0 --typecode=2:8e00 --change-name=2:'ROOT' /dev/${DISK_DRIVE} # FI
 
 echo -n "y" | mkfs.fat -F32 ${new_disk}1
 
-if [[ $ENCRYPT_DRIVE == true ]]; then
+if [[ "$ENCRYPT_DRIVE" == true ]]; then
 
 echo -n "${PASSWORD}" | cryptsetup -y -v luksFormat ${new_disk}2 -
 echo -n "${PASSWORD}" | cryptsetup open --type luks ${new_disk}2 ${STORAGE_NAME} -
@@ -251,7 +251,7 @@ fi
 pacstrap -i /mnt --needed --noconfirm base base-devel linux-firmware archlinux-keyring grub
 [[ "$BOOT_TYPE" == "EFI" ]] && pacstrap -i /mnt --needed --noconfirm efibootmgr
 
-if [[ $ENCRYPT_DRIVE == true ]]; then
+if [[ "$ENCRYPT_DRIVE" == true ]]; then
 pacstrap -i /mnt --needed --noconfirm lvm2
 fi
 genfstab -U -p /mnt >> /mnt/etc/fstab
@@ -305,13 +305,13 @@ echo "$USERNAME ALL=(ALL) ALL" >> /mnt/etc/sudoers
 sed -i "s/#\[multilib]/[multilib]/" /mnt/etc/pacman.conf
 sed -i "$!N;s/\(\[multilib]\n\)#\(Include\)/\1\2/;P;D" /mnt/etc/pacman.conf
 
-if [[ $ENCRYPT_DRIVE == true ]]; then
+if [[ "$ENCRYPT_DRIVE" == true ]]; then
 sed -r -i 's/(HOOKS=)\((.*?)\)/\1(base udev autodetect modconf block keyboard encrypt lvm2 filesystems fsck)/g' /mnt/etc/mkinitcpio.conf
 fi
 
 # ZRAM
 
-if [[ $IS_VBOX != "YES" ]]; then
+if [[ "$IS_VBOX" != "YES" ]]; then
 ram=$(((total_ram / 1000)/2))
 [[ $ram -gt 0 && $ram -lt 3500 ]] && swap_size="2G"
 [[ $ram -gt 3500 && $ram -lt 7500 ]] && swap_size="4G"
@@ -333,7 +333,7 @@ WantedBy=multi-user.target
 
 # BATTERY THRESHOLD
 
-if [[ $HAS_BATTERY_THRESHOLD == "YES" ]]; then
+if [[ "$HAS_BATTERY_THRESHOLD" == "YES" ]]; then
 echo "
 [Unit]
 Description=Set the battery charge threshold
@@ -402,20 +402,20 @@ systemctl enable dhcpcd
 [[ "$DESKTOP" == "I3WM" ]] && systemctl enable lightdm.service
 [[ "$HAS_BLUETOOTH" == "YES" ]] && systemctl enable bluetooth || echo "exit"
 
-if [[ "$IS_VBOX" != "YES" ]]; then
-[[ "$HAS_BATTERY_THRESHOLD" == "YES" ]] && systemctl enable battery-charge-threshold.service || echo "exit"
+if [[ ""$IS_VBOX"" != "YES" ]]; then
+[[ ""$HAS_BATTERY_THRESHOLD"" == "YES" ]] && systemctl enable battery-charge-threshold.service || echo "exit"
 systemctl enable zram-swap.service
 fi
 }
 
 grub_install () {
-if [[ $ENCRYPT_DRIVE == true ]]; then
+if [[ "$ENCRYPT_DRIVE" == true ]]; then
 [[ $KERNEL_PREFIX ]] && mkinitcpio -p linux-$KERNEL_PREFIX || mkinitcpio -p linux
 fi
 
 grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot
 
-if [[ $ENCRYPT_DRIVE == true ]]; then
+if [[ "$ENCRYPT_DRIVE" == true ]]; then
 STORAGE_NAME="shingha"
 VOLGRP="scrubs"
 new_disk="/dev/${DISK_DRIVE}${DISK_PREFIX}2"
@@ -430,7 +430,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 
 # TODO: re-construct
 follow_up () {
-if [[ $ENCRYPT_DRIVE == true ]]; then
+if [[ "$ENCRYPT_DRIVE" == true ]]; then
 boot_disk="\/dev\/${DISK_DRIVE}${DISK_PREFIX}1"
 disk_id=$(blkid | grep "${boot_disk}" | cut -d' ' -f2 | cut -d'=' -f2 | sed -e 's/"//g')
 sed -i "$!N;s/\(#\s*${boot_disk}\n\)\(UUID=\)\(\w*\W*\w*\)/\1\2${disk_id}/;P;D" /etc/fstab
