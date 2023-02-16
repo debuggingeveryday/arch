@@ -409,8 +409,10 @@ fi
 }
 
 grub_install () {
-if [[ "$ENCRYPT_DRIVE" == true ]]; then
-[[ $KERNEL_PREFIX ]] && mkinitcpio -p linux-$KERNEL_PREFIX || mkinitcpio -p linux
+if [[ "$ENCRYPT_DRIVE" == true && $KERNEL_PREFIX ]]; then
+mkinitcpio -p linux-$KERNEL_PREFIX
+elif
+mkinitcpio -p linux
 fi
 
 grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot
