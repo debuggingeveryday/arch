@@ -132,7 +132,7 @@ if [[ "$DISK_LIST" == *"nvme0n"* ]]; then
 update_constant "DISK_PREFIX" "p"
 fi
 
-update_constant "DESKTOP" "KDE"
+update_constant "DESKTOP" "I3WM"
 update_constant "DISK_DRIVE" "${disk[0]}"
 update_constant "HOST_NAME" "host_test"
 update_constant "USERNAME" "user_test"
@@ -295,7 +295,12 @@ systemctl enable dhcpcd
 }
 
 grub_install () {
-[[ "$ENCRYPT_DRIVE" == true ]] && mkinitcpio -p linux-$KERNEL_PREFIX || mkinitcpio -p linux
+
+if [[ "$ENCRYPT_DRIVE" == true ]]; then
+[[ "$KERNEL_PREFIX" ]] && mkinitcpio -p linux-$KERNEL_PREFIX
+else
+mkinitcpio -p linux
+fi
 
 grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot
 
