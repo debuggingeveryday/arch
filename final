@@ -1,0 +1,13 @@
+#!/bin/bash
+
+echo "
+#!/bin/bash
+
+git clone https://aur.archlinux.org/$1 $HOME/Downloads/$1
+" > /usr/local/bin/aur
+
+echo "
+#!/bin/bash
+
+echo -e "\n$1" >> ~/Desktop/notes.txt
+" > /usr/local/bin/note

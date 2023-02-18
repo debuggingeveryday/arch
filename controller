@@ -4,7 +4,7 @@
 
 ENCRYPT_DRIVE=false
 KERNEL_PREFIX=""
-DESKTOP_LIST=('KDE')
+DESKTOP_LIST=('I3WM', 'KDE')
 DISK_LIST=$(lsblk -n --output TYPE,KNAME,SIZE | awk '$1=="disk"{print "/dev/"$2}')
 
 # ------------------------------------------------------------------- #
@@ -33,7 +33,10 @@ fi
 }
 
 get_system_variables () {
-# [BEGIN]-GET CPU TOTAL #
+
+[[ $(grep -E "bluetooth" <<< $(dmesg)) ]] && update_constant "HAS_BLUETOOTH" "YES" || echo "exit"
+[[ $(grep -E "Wireless" <<< $(lspci)) ]] && update_constant "HAS_WIFI" "YES" || echo "exit"
+
 proc_type=$(lscpu)
 if grep -E "GenuineIntel" <<< ${proc_type}; then
 echo "Installing Intel microcode"
@@ -45,9 +48,7 @@ fi
 
 update_constant "CPU_TYPE" "$cpu_type"
 
-# [END]-GET CPU TOTAL #
 
-# [BEGIN]-GET GPU #
 if grep -E "NVIDIA|GeForce" <<< $(lspci); then
 gpu_type="NVIDIA"
 elif lspci | grep 'VGA' | grep -E "Radeon|AMD"; then
@@ -61,14 +62,12 @@ gpu_type="--"
 fi
 
 update_constant "GPU_TYPE" "$gpu_type"
-# [BEGIN]-GET GPU #
 
-# [BEGIN]-GET RAM TOTAL #
+
 total_ram=$(cat /proc/meminfo | grep MemTotal | awk '$1=="MemTotal:"{print $2}')
 update_constant "TOTAL_RAM" "${total_ram}"
-# [END]-GET RAM TOTAL #
 
-# [BEGIN]-GET BOOT_TYPE #
+
 if [[ -d "/sys/firmware/efi" ]]; then
 boot_type="EFI"
 else
@@ -76,7 +75,7 @@ boot_type="LEGACY"
 fi
 
 update_constant "BOOT_TYPE" "$boot_type"
-# [END]-GET BOOT_TYPE #
+
 
 }
 
@@ -209,15 +208,19 @@ genfstab -U -p /mnt >> /mnt/etc/fstab
 }
 
 install_packages_part_1 () {
-pacstrap -i /mnt --needed --noconfirm iwd dhcpcd networkmanager
+pacstrap -i /mnt --needed --noconfirm dhcpcd networkmanager
 if [ "$DESKTOP" == "KDE" ]; then
 pacstrap -i /mnt --needed --noconfirm xorg plasma-desktop plasma-wayland-session
 pacstrap -i /mnt --needed --noconfirm sddm
+elif [ "$DESKTOP" == "I3WM" ]; then
+pacstrap -i /mnt --needed --noconfirm xorg i3 dmenu lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings
 fi
 
 if [ "$GPU_TYPE" == "NVIDIA" ]; then
 pacstrap -i /mnt --needed --noconfirm cuda lib32-libvdpau lib32-nvidia-utils lib32-opencl-nvidia libvdpau libxnvctrl nvidia-settings nvidia-utils opencl-nvidia nvidia
 fi
+
+[[ "$HAS_WIFI" == "YES" ]] && pacstrap -i /mnt --needed --noconfirm iwd
 }
 
 modify_config () {
@@ -278,14 +281,17 @@ pacstrap -i /mnt --noconfirm gnome-keyring libsecret
 # fix sound and wifi applet
 pacstrap -i /mnt --noconfirm plasma-pa plasma-nm
 fi
+
+[[ "$HAS_BLUETOOTH" == "YES" ]] &&  pacstrap -i /mnt --noconfirm pulseaudio-bluetooth bluez-utils bluez || echo "exit"
 }
 
 enable_service () {
 systemctl enable NetworkManager
 systemctl enable dhcpcd
-systemctl enable iwd.service
 [[ "$DESKTOP" == "KDE" ]] && systemctl enable sddm.service
-systemctl enable bluetooth
+[[ "$DESKTOP" == "I3WM" ]] && systemctl enable lightdm.service
+[[ "$HAS_BLUETOOTH" == "YES" ]] && systemctl enable bluetooth || echo "exit"
+[[ "$HAS_WIFI" == "YES" ]] && systemctl enable iwd.service || echo "exit"
 }
 
 grub_install () {
