@@ -2,10 +2,9 @@
 
 declare +i -r MAIN_DIRECTORY="${PWD}"
 
-read -sp "password" $PASSWORD
-echo "${PASSWORD}" | su root
+read -sp "password => " $PASSWORD
 
-echo "
+echo "$PASSWORD" | echo "
 #!/bin/bash
 
 git clone https://aur.archlinux.org/$1 $HOME/Downloads/$1
@@ -16,6 +15,8 @@ echo "
 
 echo -e "\n$1" >> ~/Desktop/notes.txt
 " > /usr/local/bin/note
+
+exit 0
 
 # ---------------------------- git ------------------------- #
 

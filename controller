@@ -127,11 +127,12 @@ read -sp "PASSWORD: " password && update_constant "PASSWORD" "$password"
 }
 
 get_desktop_variables () {
+declare -i index=0
 
 echo ""
 echo ""
-for i in $DESKTOP_LIST; do
-index+=1
+for i in ${DESKTOP_LIST[@]}; do
+((index=index+1))
 echo "$index. $i"
 done
 echo ""
@@ -349,7 +350,6 @@ pacstrap -i /mnt --noconfirm gnome-keyring libsecret
 
 # fix sound and wifi applet
 pacstrap -i /mnt --noconfirm plasma-pa plasma-nm
-fi
 
 elif [ "$DESKTOP" == "I3WM" ]; then
 pacstrap -i /mnt --needed --noconfirm kitty mpv ranger picom
