@@ -1,3 +1,4 @@
+# CHANGE DNS for faster download
 
 echo "
 nameserver 8.8.8.8
