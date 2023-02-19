@@ -10,7 +10,7 @@ namserver 8.8.4.4
 
 ENCRYPT_DRIVE="YES"
 KERNEL_PREFIX=""
-DESKTOP_LIST=('I3WM', 'KDE')
+DESKTOP_LIST=('I3WM' 'KDE')
 BATTERY_LIST=('BAT0' 'BAT1' 'BATC' 'BATT')
 DISK_LIST=$(lsblk -n --output TYPE,KNAME,SIZE | awk '$1=="disk"{print "/dev/"$2}')
 
