@@ -1,3 +1,9 @@
+
+echo "
+nameserver 8.8.8.8
+namserver 8.8.4.4
+" > /etc/resolv.conf
+
 # ------------------------------------------------------------------- #
 #                               CONSTANTS                             #
 # ------------------------------------------------------------------- #
@@ -5,6 +11,7 @@
 ENCRYPT_DRIVE=false
 KERNEL_PREFIX=""
 DESKTOP_LIST=('I3WM', 'KDE')
+BATTERY_LIST=('BAT0' 'BAT1' 'BATC' 'BATT')
 DISK_LIST=$(lsblk -n --output TYPE,KNAME,SIZE | awk '$1=="disk"{print "/dev/"$2}')
 
 # ------------------------------------------------------------------- #
@@ -33,6 +40,20 @@ fi
 }
 
 get_system_variables () {
+
+# ------------------------- GET RAM TOTAL --------------------------- #
+
+total_ram=$(cat /proc/meminfo | grep MemTotal | awk '$1=="MemTotal:"{print $2}')
+update_constant "TOTAL_RAM" "${total_ram}"
+
+
+# TODO: filter add BAT0 BAT1 ...
+for battery in batteries; do
+if [[ -d "/sys/class/power_supply/${battery}" ]]; then
+update_constant "BATTERY" ${battery}
+update_constant "HAS_BATTERY_THRESHOLD" "YES" || echo "exit"
+fi
+done
 
 [[ $(grep -E "bluetooth" <<< $(dmesg)) ]] && update_constant "HAS_BLUETOOTH" "YES" || echo "exit"
 [[ $(grep -E "Wireless" <<< $(lspci)) ]] && update_constant "HAS_WIFI" "YES" || echo "exit"
@@ -75,7 +96,6 @@ boot_type="LEGACY"
 fi
 
 update_constant "BOOT_TYPE" "$boot_type"
-
 
 }
 
@@ -224,6 +244,36 @@ fi
 }
 
 modify_config () {
+
+ram=$(((TOTAL_RAM / 1000)/2))
+
+if [[ $ram -gt 0 && $ram -lt 3500 ]]; then
+swap_size="2G"
+elif [[ $ram -gt 3500 && $ram -lt 7500 ]]; then
+swap_size="4G"
+elif [[ $ram -gt 7500 && $ram -lt 15500 ]]; then
+swap_size="8G"
+fi
+
+# -------------- debuging ---------------- #
+
+echo "
+[Unit]
+Description=zRam block devices swapping
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/bash -c 'modprobe zram && echo lz4 > /sys/block/zram0/comp_algorithm && echo ${swap_size} > /sys/block/zram0/disksize && mkswap --label zram0 /dev/zram0 && swapon --priority 100 /dev/zram0'
+ExecStop=/usr/bin/bash -c 'swapoff /dev/zram0 && rmmod zram'
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+
+" > /mnt/etc/systemd/system/zram-swap.service
+
+# -------------- debuging ---------------- #
+
 sed -i 's/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g' /mnt/etc/locale.gen
 ln -sf /mnt/usr/share/zoneinfo/Asia/Manila /mnt/etc/localtime
 
@@ -243,6 +293,24 @@ sed -i "s/#\[multilib]/[multilib]/" /mnt/etc/pacman.conf
 sed -i "$!N;s/\(\[multilib]\n\)#\(Include\)/\1\2/;P;D" /mnt/etc/pacman.conf
 
 [[ "$ENCRYPT_DRIVE" == true ]] && sed -r -i 's/(HOOKS=)\((.*?)\)/\1(base udev autodetect modconf block keyboard encrypt lvm2 filesystems fsck)/g' /mnt/etc/mkinitcpio.conf || echo "exit"
+
+
+if [[ "$HAS_BATTERY_THRESHOLD" == "YES" ]]; then
+echo "
+[Unit]
+Description=Set the battery charge threshold
+After=multi-user.target
+StartLimitBurst=0
+
+[Service]
+Type=oneshot
+Restart=on-failure
+ExecStart=/bin/bash -c 'echo 60 > /sys/class/power_supply/${BATTERY}/charge_control_end_threshold'
+
+[Install]
+WantedBy=multi-user.target
+" > /mnt/etc/systemd/battery-charge-threshold.service
+fi
 }
 
 set_timezone () {
@@ -292,6 +360,8 @@ systemctl enable dhcpcd
 [[ "$DESKTOP" == "I3WM" ]] && systemctl enable lightdm.service
 [[ "$HAS_BLUETOOTH" == "YES" ]] && systemctl enable bluetooth || echo "exit"
 [[ "$HAS_WIFI" == "YES" ]] && systemctl enable iwd.service || echo "exit"
+[[ "$HAS_BATTERY_THRESHOLD" == "YES" ]] && systemctl enable battery-charge-threshold.service || echo "exit"
+systemctl enable zram-swap.service
 }
 
 grub_install () {
