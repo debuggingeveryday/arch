@@ -9,7 +9,7 @@ namserver 8.8.4.4
 #                               CONSTANTS                             #
 # ------------------------------------------------------------------- #
 
-ENCRYPT_DRIVE="YES"
+ENCRYPT_DRIVE=true
 KERNEL_PREFIX=""
 DESKTOP_LIST=('I3WM' 'KDE')
 BATTERY_LIST=('BAT0' 'BAT1' 'BATC' 'BATT')
