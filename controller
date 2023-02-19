@@ -8,7 +8,7 @@ namserver 8.8.4.4
 #                               CONSTANTS                             #
 # ------------------------------------------------------------------- #
 
-ENCRYPT_DRIVE=false
+ENCRYPT_DRIVE="YES"
 KERNEL_PREFIX=""
 DESKTOP_LIST=('I3WM', 'KDE')
 BATTERY_LIST=('BAT0' 'BAT1' 'BATC' 'BATT')
@@ -370,7 +370,7 @@ systemctl enable zram-swap.service
 
 grub_install () {
 
-if [[ "$ENCRYPT_DRIVE" == true ]]; then
+if [[ "$KERNEL_PREFIX" ]]; then
 [[ "$KERNEL_PREFIX" ]] && mkinitcpio -p linux-$KERNEL_PREFIX
 else
 mkinitcpio -p linux

@@ -27,4 +27,7 @@ get_system_variables
 [[ "$install_type" != "DEBUG" ]] && get_users_variables
 [[ "$install_type" != "DEBUG" ]] && [[ "$install_type" != "BASIC" ]] && get_desktop_variables
 
+cat ./constants.conf
+read -p ""
+
 ./run
