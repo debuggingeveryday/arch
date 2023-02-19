@@ -1,5 +1,10 @@
 #!/bin/bash
 
+declare +i -r MAIN_DIRECTORY="${PWD}"
+
+read -sp "password" $PASSWORD
+echo "${PASSWORD}" | su root
+
 echo "
 #!/bin/bash
 
@@ -11,3 +16,61 @@ echo "
 
 echo -e "\n$1" >> ~/Desktop/notes.txt
 " > /usr/local/bin/note
+
+# ---------------------------- git ------------------------- #
+
+read -p "user" $USERNAME
+read -p "email" $EMAIL
+
+git config --global user.name "${USERNAME}"
+git config --global user.email "${EMAIL}"
+
+# ------------------------ polybar ------------------------------ #
+
+sudo pacman -S polybar
+if [[ ! -d "~/.config/polybar" ]]; then
+mkdir ~/.config/polybar
+cp ./files/polybar/config  ~/.config/polybar/config
+cp ./files/polybar/launch  ~/.config/polybar/launch
+chmod u+x ~/.config/polybar/launch
+fi
+
+# ------------------------ i3 ---------------------------------- #
+
+cp ./files/i3/config  ~/.config/i3/config
+
+# ------------------------ ranger ----------------------------- #
+
+cp ./files/ranger/rc.conf ~/.config/ranger/rc.conf
+
+# ------------------------- packages --------------------------- #
+
+pacman_packages=(
+    'docker'
+    'docker-compose'
+    'gimp'
+)
+
+pacman -Sy $pacman_packages
+
+systemctl enable docker.service
+
+# ------------------------- aur -------------------------- #
+
+aur_packages=(
+    'visual-studio-code-bin'
+    'gitkraken'
+    'beekeeper-studio'
+    'simple-mtpfs'
+    'wps-office'
+)
+
+for aur_package in aur_packages; do
+$(aur $aur_package && cd $aur_package && makepkg -si)
+done
+
+# ------------------------- font ------------------------ #
+
+wget -P ${PWD}/cascadia-code/CascadiaCode.zip https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/CascadiaCode.zip
+mv cascadia-code /usr/local/share/fonts/cascadia-code
+fc-cache -Ev

@@ -350,6 +350,10 @@ pacstrap -i /mnt --noconfirm gnome-keyring libsecret
 pacstrap -i /mnt --noconfirm plasma-pa plasma-nm
 fi
 
+elif [ "$DESKTOP" == "I3WM" ]; then
+pacstrap -i /mnt --needed --noconfirm kitty mpv ranger picom
+fi
+
 [[ "$HAS_BLUETOOTH" == "YES" ]] &&  pacstrap -i /mnt --noconfirm pulseaudio-bluetooth bluez-utils bluez || echo "exit"
 }
 
