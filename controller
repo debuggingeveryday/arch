@@ -411,7 +411,7 @@ fi
 grub_install () {
 if [[ "$ENCRYPT_DRIVE" == true && $KERNEL_PREFIX ]]; then
 mkinitcpio -p linux-$KERNEL_PREFIX
-elif
+else
 mkinitcpio -p linux
 fi
 
