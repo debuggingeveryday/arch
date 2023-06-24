@@ -49,7 +49,7 @@ update_constant "TOTAL_RAM" "${total_ram}"
 
 
 # TODO: filter add BAT0 BAT1 ...
-for battery in batteries; do
+for battery in $BATTERY_LIST; do
 if [[ -d "/sys/class/power_supply/${battery}" ]]; then
 update_constant "BATTERY" ${battery}
 update_constant "HAS_BATTERY_THRESHOLD" "YES" || echo "exit"
