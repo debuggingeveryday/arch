@@ -374,6 +374,9 @@ install_packages_part_2 () {
 # TODO: fix this "error: Partition / too full"
 
 pacstrap -i /mnt --noconfirm --needed bzip2 p7zip git firefox
+
+# Sound ui and sound driver
+pacstrap -i /mnt --noconfirm --needed pulseaudio pavucontrol
 # pacstrap -i /mnt --noconfirm --needed gimp
 
 if [ "$DESKTOP" == "KDE" ]; then
@@ -397,6 +400,7 @@ fi
 enable_service () {
 systemctl enable NetworkManager
 systemctl enable dhcpcd
+systemctl enable pulseaudio.service
 [[ "$HAS_WIFI" == "YES" ]] && systemctl enable iwd.service || echo "exit"
 [[ "$DESKTOP" == "KDE" ]] && systemctl enable sddm.service
 [[ "$DESKTOP" == "I3WM" ]] && systemctl enable lightdm.service
