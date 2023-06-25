@@ -338,6 +338,9 @@ pacstrap -i /mnt --noconfirm --needed git
 pacstrap -i /mnt --noconfirm --needed firefox
 # pacstrap -i /mnt --noconfirm --needed gimp
 
+# Sound driver and UI
+pacstrap -i /mnt --noconfirm --needed pulseaudio pavucontrol
+
 if [ "$DESKTOP" == "KDE" ]; then
 # important apps
 pacstrap -i /mnt --noconfirm kwrite ark dolphin kwallet konsole latte-dock
@@ -361,6 +364,8 @@ fi
 enable_service () {
 systemctl enable NetworkManager
 systemctl enable dhcpcd
+systemctl --user enable pulseaudio.service
+
 [[ "$DESKTOP" == "KDE" ]] && systemctl enable sddm.service
 [[ "$DESKTOP" == "I3WM" ]] && systemctl enable lightdm.service
 [[ "$HAS_BLUETOOTH" == "YES" ]] && systemctl enable bluetooth || echo "exit"
