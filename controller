@@ -311,7 +311,7 @@ ExecStart=/bin/bash -c 'echo 60 > /sys/class/power_supply/${BATTERY}/charge_cont
 
 [Install]
 WantedBy=multi-user.target
-" > /mnt/etc/systemd/battery-charge-threshold.service
+" > /mnt/etc/systemd/system/battery-charge-threshold.service
 fi
 }
 
