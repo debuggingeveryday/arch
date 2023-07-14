@@ -257,8 +257,6 @@ elif [[ $ram -gt 7500 && $ram -lt 15500 ]]; then
 swap_size="8G"
 fi
 
-# -------------- debuging ---------------- #
-
 echo "
 [Unit]
 Description=zRam block devices swapping
@@ -273,8 +271,6 @@ RemainAfterExit=yes
 WantedBy=multi-user.target
 
 " > /mnt/etc/systemd/system/zram-swap.service
-
-# -------------- debuging ---------------- #
 
 sed -i 's/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g' /mnt/etc/locale.gen
 ln -sf /mnt/usr/share/zoneinfo/Asia/Manila /mnt/etc/localtime
@@ -313,6 +309,11 @@ ExecStart=/bin/bash -c 'echo 60 > /sys/class/power_supply/${BATTERY}/charge_cont
 WantedBy=multi-user.target
 " > /mnt/etc/systemd/system/battery-charge-threshold.service
 fi
+
+echo "
+nameserver 8.8.8.8
+namserver 8.8.4.4
+" > /mnt/etc/resolv.conf.head
 }
 
 set_timezone () {
@@ -355,7 +356,7 @@ pacstrap -i /mnt --noconfirm gnome-keyring libsecret
 pacstrap -i /mnt --noconfirm plasma-pa plasma-nm
 
 elif [ "$DESKTOP" == "I3WM" ]; then
-pacstrap -i /mnt --needed --noconfirm kitty mpv ranger picom
+pacstrap -i /mnt --needed --noconfirm alacritty mpv ranger picom
 fi
 
 [[ "$HAS_BLUETOOTH" == "YES" ]] &&  pacstrap -i /mnt --noconfirm pulseaudio-bluetooth bluez-utils bluez || echo "exit"

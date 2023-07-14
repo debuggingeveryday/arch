@@ -18,4 +18,4 @@ grub_install
 
 rm -rvf ./chroot
 rm -rvf ./controller
-rm -rvf ./constants.conf
+rm -rvf ./constants.conf 
