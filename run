@@ -7,11 +7,17 @@ source ./controller
 # ------------------------------------------------------------------- #
 
 set_date
+read -p ""
 disk_partition
+read -p ""
 install_primary_setup
+read -p ""
 install_packages_part_1
+read -p ""
 install_packages_part_2
+read -p ""
 modify_config
+read -p ""
 
 # ------------------------------------------------------------------- #
 #                           REDIRECT TO CHROOT                        #
