@@ -2,14 +2,18 @@
 [[ -f "controller" ]] && source ./controller || exit 0
 
 set_timezone
+read -p ""
 set_user
+read -p ""
 enable_service
+read -p ""
 
 # ------------------------------------------------------------------- #
 #                           DEBUGGING GRUB                            #
 # ------------------------------------------------------------------- #
 
 grub_install
+read -p ""
 # follow_up
 
 # ------------------------------------------------------------------- #
