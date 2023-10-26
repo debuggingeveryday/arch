@@ -1,0 +1,116 @@
+# ************* CONSTANTS ************* #
+set -e
+
+DISK_DRIVE="sda"
+DISK_PREFIX=""
+BOOT_TYPE="EFI"
+HAS_WIFI="NO"
+HOST_NAME="host_test"
+USERNAME="user_test"
+PASSWORD="12345"
+
+# ************* INITIALIZATION ********* #
+pacman-key --init && pacman-key --populate
+
+# ************* PARTITION ************* #
+
+new_disk="/dev/${DISK_DRIVE}${DISK_PREFIX}"
+
+umount -A --recursive /mnt && echo "umount" || echo "cant umount no mounted found"
+swapoff -a
+wipefs --all --force /dev/${DISK_DRIVE}
+sgdisk -Z /dev/${DISK_DRIVE}
+sgdisk -a 2048 -o /dev/${DISK_DRIVE}
+new_disk="/dev/${DISK_DRIVE}${DISK_PREFIX}"
+
+[[ "$BOOT_TYPE" == "EFI" ]] && disk_size="+300M"
+[[ "$BOOT_TYPE" == "LEGACY" ]] && disk_size="+1M"
+
+sgdisk -n 1::$disk_size --typecode=1:ef00 --change-name=1:'BOOT' /dev/${DISK_DRIVE} # EFI /dev/nvme0n1p1
+sgdisk -n 2::-0 --typecode=2:8e00 --change-name=2:'ROOT' /dev/${DISK_DRIVE} # FILE SYSTEM /dev/nvme0n1p3
+
+echo -n "y" | mkfs.fat -F32 ${new_disk}1
+
+echo -n "y" | mkfs.ext4 ${new_disk}2
+mount ${new_disk}2 /mnt
+mkdir /mnt/boot
+mount ${new_disk}1 /mnt/boot
+
+# ************* INSTALL FIRMWARE ************* #
+
+pacstrap -i /mnt --needed --noconfirm base base-devel linux linux-firmware archlinux-keyring grub
+[[ "$BOOT_TYPE" == "EFI" ]] && pacstrap -i /mnt --needed --noconfirm efibootmgr
+genfstab -U -p /mnt >> /mnt/etc/fstab
+
+# ************* ESSENTIAL PACKAGE ************* #
+
+pacstrap -i /mnt --needed --noconfirm dhcpcd networkmanager
+[[ "$HAS_WIFI" == "YES" ]] && pacstrap -i /mnt --needed --noconfirm iwd
+
+# ************ MODIFY CONFIG ****************** #
+
+sed -i 's/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g' /mnt/etc/locale.gen
+ln -sf /mnt/usr/share/zoneinfo/Asia/Manila /mnt/etc/localtime
+
+echo "
+$HOST_NAME
+127.0.0.1 localhost
+::1       localhost
+127.0.0.1 $HOST_NAME.localdomain $HOST_NAME
+" > /mnt/etc/hosts
+
+echo "${HOST_NAME}" > /mnt/etc/hostname
+
+sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /mnt/etc/sudoers
+echo "$USERNAME ALL=(ALL) ALL" >> /mnt/etc/sudoers
+
+sed -i "s/#\[multilib]/[multilib]/" /mnt/etc/pacman.conf
+sed -i "$!N;s/\(\[multilib]\n\)#\(Include\)/\1\2/;P;D" /mnt/etc/pacman.conf
+
+echo "
+nameserver 8.8.8.8
+namserver 8.8.4.4
+" > /mnt/etc/resolv.conf.head
+
+# --------------- ARCH-CHROOT **************** #
+echo "
+set -e
+
+DISK_DRIVE="$DISK_DRIVE"
+DISK_PREFIX="$DISK_PREFIX"
+BOOT_TYPE="$BOOT_TYPE"
+HAS_WIFI="$HAS_WIFI"
+HOST_NAME="$HOST_NAME"
+USERNAME="$USERNAME"
+PASSWORD="$PASSWORD"
+
+pacman-key --init && pacman-key --populate
+
+pacman -Syu --noconfirm --needed
+
+locale-gen
+locale > /etc/locale.conf
+hwclock --systohc --utc
+
+echo "root:${PASSWORD}" | chpasswd
+useradd -m $USERNAME
+echo "$USERNAME:${PASSWORD}" | chpasswd
+
+whereis sudo
+usermod -aG wheel,audio,video,optical,storage $USERNAME
+groups $USERNAME
+
+systemctl enable NetworkManager
+systemctl enable dhcpcd
+
+[[ "$HAS_WIFI" == "YES" ]] && systemctl enable iwd.service || echo "exit"
+
+mkinitcpio -p linux
+grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot
+grub-mkconfig -o /boot/grub/grub.cfg" > arch-chroot_script.sh
+
+chmod u+x ./arch-chroot_script.sh
+
+mv ./arch-chroot_script.sh /mnt
+
+arch-chroot /mnt /arch-chroot_script.sh
