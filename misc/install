@@ -29,5 +29,5 @@ genfstab -U /mnt >> /mnt/etc/fstab
 
 cat /mnt/etc/fstab
 
-cp chroot /mnt
+cp ./chroot /mnt
 arch-chroot /mnt ./chroot
