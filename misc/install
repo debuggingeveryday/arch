@@ -54,4 +54,4 @@ TARGET_DISK=$TARGET_DISK" > constant.conf
 cp ./constant.conf /mnt
 cp ./chroot /mnt
 
-arch-chroot /mnt ./chroot
+arch-chroot /mnt /chroot
