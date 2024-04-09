@@ -24,13 +24,6 @@ echo "root:${PASSWORD}" | chpasswd
 useradd -m $USERNAME
 echo "$USERNAME:${PASSWORD}" | chpasswd
 
-whereis sudo
-usermod -aG wheel,audio,video,optical,storage $USERNAME
-groups $USERNAME
-
-sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /etc/sudoers
-echo "$USERNAME ALL=(ALL) ALL" >> /etc/sudoers
-
 pacman -Sy grub
 
 [[ "$BOOT_TYPE" == "UEFI" ]] && pacman -Sy efibootmgr
