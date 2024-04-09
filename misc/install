@@ -27,13 +27,13 @@ sgdisk -Z $TARGET_DISK
 sgdisk -a 2048 -o $TARGET_DISK
 
 if [[ "$BOOT_TYPE" == "UEFI" ]]; then
-    sgdisk -n 1::$DISK_SIZE --typecode=2:ef00 --change-name=1:'BOOT' $TARGET_DISK
-    sgdisk -n 2::-0 --typecode=1:8300 --change-name=2:'ROOT' $TARGET_DISK
+    sgdisk -n 1::$DISK_SIZE --typecode=1:ef00 --change-name=1:'BOOT' $TARGET_DISK
+    sgdisk -n 2::-0 --typecode=2:8300 --change-name=2:'ROOT' $TARGET_DISK
 elif [[ "$BOOT_TYPE" == "LEGACY" ]]; then
     sgdisk -n 1::-0 --typecode=1:8300 --change-name=1:'ROOT' $TARGET_DISK
 fi
 
-echo "${TARGET_DISK}2"
+exit 0
 
 if [[ "$BOOT_TYPE" == "UEFI" ]]; then
     mkfs.fat -F 32 ${TARGET_DISK}1
