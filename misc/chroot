@@ -28,7 +28,7 @@ pacman -Sy grub
 
 [[ "$BOOT_TYPE" == "UEFI" ]] && pacman -Sy efibootmgr
 
-[[ "$BOOT_TYPE" == "UEFI" && "$SYSTEM_BIT_OS" == "64" ]] && grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
+[[ "$BOOT_TYPE" == "UEFI" && "$SYSTEM_BIT_OS" == "64" ]] && grub-install --target=x86_64-efi --boot-directory=/boot --bootloader-id=GRUB
 [[ "$BOOT_TYPE" == "LEGACY" ]] && grub-install --target=i386-pc $TARGET_DISK
 
 grub-mkconfig -o /boot/grub/grub.cfg
