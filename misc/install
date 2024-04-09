@@ -13,6 +13,10 @@ TARGET_DISK="/dev/sda"
 
 [[ -d "/sys/firmware/efi" ]] && BOOT_TYPE="UEFI" || BOOT_TYPE="LEGACY"
 
+echo $BOOT_TYPE
+
+exit 0
+
 [[ "$BOOT_TYPE" == "UEFI" ]] && BOOT_DISK_SIZE="+300M"
 [[ "$BOOT_TYPE" == "LEGACY" ]] && BOOT_DISK_SIZE="+1M"
 
@@ -32,8 +36,6 @@ if [[ "$BOOT_TYPE" == "UEFI" ]]; then
 elif [[ "$BOOT_TYPE" == "LEGACY" ]]; then
     sgdisk -n 1::-0 --typecode=1:8300 --change-name=1:'ROOT' $TARGET_DISK
 fi
-
-exit 0
 
 if [[ "$BOOT_TYPE" == "UEFI" ]]; then
     mkfs.fat -F 32 ${TARGET_DISK}1
