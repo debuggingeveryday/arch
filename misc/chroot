@@ -1,6 +1,14 @@
 #!/bin/bash
 
-set -e
+handle_error() {
+    local error_code="$?"
+    echo "An error occurred in line ${BASH_LINENO[0]} with exit code $error_code"
+    exit $error_code
+}
+
+trap 'handle_error' ERR
+
+set -e 
 
 [[ -f "constants.conf" ]] && source ./constants.conf || exit 0
 
