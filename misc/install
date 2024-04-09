@@ -40,7 +40,7 @@ if [[ "$BOOT_TYPE" == "UEFI" ]]; then
     mount ${TARGET_DISK}2 /mnt
 elif [[ "$BOOT_TYPE" == "LEGACY" ]]; then
     mkfs.ext4 ${TARGET_DISK}1
-     mount ${TARGET_DISK}1 /mnt
+    mount ${TARGET_DISK}1 /mnt
 fi
 
 pacstrap -K /mnt base linux linux-firmware
