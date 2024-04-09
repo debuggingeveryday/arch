@@ -47,9 +47,9 @@ pacstrap -K /mnt base linux linux-firmware
 genfstab -U /mnt >> /mnt/etc/fstab
 
 echo " 
-    BOOT_TYPE=$BOOT_TYPE\n
-    SYSTEM_BIT_OS=$SYSTEM_BIT_OS\n
-    TARGET_DISK=$TARGET_DISK" > constant.conf
+BOOT_TYPE=$BOOT_TYPE\n
+SYSTEM_BIT_OS=$SYSTEM_BIT_OS\n
+TARGET_DISK=$TARGET_DISK" > constant.conf
 
 cp ./constant.conf /mnt
 cp ./chroot /mnt
