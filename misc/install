@@ -43,7 +43,10 @@ elif [[ "$BOOT_TYPE" == "LEGACY" ]]; then
     mount ${TARGET_DISK}1 /mnt
 fi
 
+set +e
 pacstrap -K /mnt base linux linux-firmware
+set -e
+
 genfstab -U /mnt >> /mnt/etc/fstab
 
 echo " 
