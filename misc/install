@@ -8,7 +8,6 @@ TARGET_DISK="/dev/sda"
 
 [[ $(cat /sys/firmware/efi/fw_platform_size) == "64" ]] && SYSTEM_BIT_OS="64"
 [[ $(cat /sys/firmware/efi/fw_platform_size) == "32" ]] && SYSTEM_BIT_OS="32"
-[[ ]]
 
 [[ ! $(ip link) && $(ping archlinux.org) ]] && exit 0
 
