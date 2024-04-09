@@ -1,42 +1,32 @@
 #!/bin/bash
 
-handle_error() {
-    local error_code="$?"
-    echo "An error occurred in line ${BASH_LINENO[0]} with exit code $error_code"
-    exit $error_code
-}
-
-trap 'handle_error' ERR
-
-set -e 
-
-[[ -f "constants.conf" ]] && source ./constants.conf || exit 0
-
-TIMEZONE="Asia/Manila"
-
-ln -sf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime
-
-hwclock --systohc
+ln -sf /usr/share/zoneinfo/Asia/Manila  /etc/localtime
+hwclock --systohc --utc
+echo en_US.UTF-8 UTF-8 >> /etc/locale.gen
 locale-gen
+echo LANG=en_US.UTF-8 > /etc/locale.conf
 
-echo "LANG=en_US.UTF-8" > /etc/locale.conf
+echo ScrubbyHost > /etc/hostname
 
-# /etc/vconsole.conf
+mkinitcpio -p linux-lts
+useradd -m -G sys,wheel,users,adm,log -s /bin/bash scrubs
 
-echo "ScrubbyHost" > /etc/hostname
+passwd
 
-USERNAME="scrubs"
-PASSWORD="1234"
+echo "
+    127.0.0.1 localhost
+    ::        localhost
+    127.0.1.1  ScrubbyHost.localdomain ScrubbyHost" > /etc/hosts
 
-echo "root:${PASSWORD}" | chpasswd
-useradd -m $USERNAME
-echo "$USERNAME:${PASSWORD}" | chpasswd
+sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /mnt/etc/sudoers
+echo "scrubs ALL=(ALL) ALL" >> /mnt/etc/sudoers
 
-pacman -Sy grub
+sed -i "s/#\[multilib]/[multilib]/" /mnt/etc/pacman.conf
+sed -i "$!N;s/\(\[multilib]\n\)#\(Include\)/\1\2/;P;D" /mnt/etc/pacman.conf
 
-[[ "$BOOT_TYPE" == "UEFI" ]] && pacman -Sy efibootmgr
+pacman -Syy
 
-[[ "$BOOT_TYPE" == "UEFI" && "$SYSTEM_BIT_OS" == "64" ]] && grub-install --target=x86_64-efi --boot-directory=/boot --bootloader-id=GRUB
-[[ "$BOOT_TYPE" == "LEGACY" ]] && grub-install --target=i386-pc $TARGET_DISK
-
+pacman -S grub efibootmgr os-prober
+grub-install --target=x86_64-efi --bootloader-id=grub --efi-directory=/boot/efi
 grub-mkconfig -o /boot/grub/grub.cfg
+
