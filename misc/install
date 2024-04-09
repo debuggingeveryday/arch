@@ -2,7 +2,7 @@
 
 set -e
 
-if [[ -f "constants.conf" ]] && rm -rvf ./constants.conf
+if [[ -f "constants.conf" ]] && rm -f ./constants.conf
 
 TARGET_DISK="/dev/sda"
 
@@ -49,9 +49,9 @@ genfstab -U /mnt >> /mnt/etc/fstab
 echo " 
 BOOT_TYPE=$BOOT_TYPE\n
 SYSTEM_BIT_OS=$SYSTEM_BIT_OS\n
-TARGET_DISK=$TARGET_DISK" > constant.conf
+TARGET_DISK=$TARGET_DISK" > constants.conf
 
-cp ./constant.conf /mnt
+cp ./constants.conf /mnt
 cp ./chroot /mnt
 
 arch-chroot /mnt /chroot
