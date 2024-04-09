@@ -28,7 +28,7 @@ sgdisk -a 2048 -o $TARGET_DISK
 
 if [[ "$BOOT_TYPE" == "UEFI" ]]; then
     sgdisk -n 1::$DISK_SIZE --typecode=1:ef00 --change-name=1:'BOOT' $TARGET_DISK
-    sgdisk -n 2::-0 --typecode=2:8e00 --change-name=2:'ROOT' $TARGET_DISK
+    sgdisk -n 2::-0 --typecode=2:8300 --change-name=2:'ROOT' $TARGET_DISK
 elif [[ "$BOOT_TYPE" == "LEGACY" ]]; then
     sgdisk -n 1::-0 --typecode=1:8e00 --change-name=1:'ROOT' $TARGET_DISK
 fi
