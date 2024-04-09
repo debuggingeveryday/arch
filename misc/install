@@ -30,4 +30,4 @@ genfstab -U /mnt >> /mnt/etc/fstab
 cat /mnt/etc/fstab
 
 cp ./chroot /mnt
-arch-chroot /mnt ./chroot
+arch-chroot /mnt /chroot
