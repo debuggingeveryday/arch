@@ -36,8 +36,8 @@ fi
 if [[ "$BOOT_TYPE" == "UEFI" ]]; then
     mkfs.fat -F 32 ${TARGET_DISK}1
     mkfs.ext4 ${TARGET_DISK}2
-    mount --mkdir ${TARGET_DISK}1 /mnt/boot
     mount ${TARGET_DISK}2 /mnt
+    mount --mkdir ${TARGET_DISK}1 /mnt/boot
 elif [[ "$BOOT_TYPE" == "LEGACY" ]]; then
     mkfs.ext4 ${TARGET_DISK}1
     mount ${TARGET_DISK}1 /mnt
