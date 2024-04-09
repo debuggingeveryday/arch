@@ -2,7 +2,7 @@
 
 set -e
 
-# if [[ -f "constants.conf" ]] && rm -f ./constants.conf
+if [[ -f "constants.conf" ]] && rm -f ./constants.conf
 
 # TARGET_DISK="/dev/sda"
 
