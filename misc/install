@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# [ -d /sys/firmware/efi/efivars ] && BOOT_TYPE="UEFI" || BOOT_TYPE="LEGACY"
+[ -d /sys/firmware/efi/efivars ] && BOOT_TYPE="UEFI" || BOOT_TYPE="LEGACY"
 
 loadkeys en
 setfont ter-132b
@@ -22,7 +22,7 @@ mount /dev/sda2 /mnt
 mkdir -p /mnt/boot/efi
 mount /dev/sda1 /mnt/boot/efi
 
-pacstrap /mnt base linux linux-firmware
+pacstrap /mnt base base-devel linux linux-firmware linux-headers
 
 genfstab -U /mnt >> /mnt/etc/fstab
 
