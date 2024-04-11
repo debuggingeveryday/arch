@@ -27,6 +27,5 @@ sed -i "$!N;s/\(\[multilib]\n\)#\(Include\)/\1\2/;P;D" /etc/pacman.conf
 pacman -Syy
 
 pacman -S grub efibootmgr os-prober
-# grub-install --target=x86_64-efi --bootloader-id=grub --efi-directory=/boot/efi
-grub-install /dev/sda
+grub-install --target=x86_64-efi --bootloader-id=grub --efi-directory=/boot/efi --removable
 grub-mkconfig -o /boot/grub/grub.cfg
