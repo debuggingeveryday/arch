@@ -20,7 +20,15 @@ mkfs.ext4 /dev/sda2
 
 mount /dev/sda2 /mnt
 
-pacstrap /mnt base base-devel linux linux-firmware linux-headers
+# -- test -- #
+mkdir -p /boot/efi
+mount /dev/sda1 /boot/efi
+
+# -- default -- #
+# pacstrap /mnt base base-devel linux linux-firmware linux-headers
+
+# -- test -- #
+pacstrap /mnt base base-devel linux linux-firmware linux-headers grub efibootmgr os-prober
 
 genfstab -U /mnt >> /mnt/etc/fstab
 
