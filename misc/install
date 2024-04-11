@@ -9,6 +9,10 @@ timedatectl
 umount -a
 swapoff -a
 wipefs --all --force /dev/sda
+
+fdisk -l
+read -p "check is all cleared disk"
+
 sgdisk -Z /dev/sda
 sgdisk -a 2048 -o /dev/sda
 
