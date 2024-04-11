@@ -2,29 +2,42 @@
 
 pacman-key --init && pacman-key --populate
 
-ln -sf /usr/share/zoneinfo/Asia/Manila  /etc/localtime
-hwclock --systohc --utc
-sed -i 's/#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen
-locale-gen
-echo LANG=en_US.UTF-8 > /etc/locale.conf
+# -- default -- #
+# ln -sf /usr/share/zoneinfo/Asia/Manila  /etc/localtime
 
-echo ScrubbyHost > /etc/hostname
+hwclock --systohc --utc
+# -- default -- #
+# sed -i 's/#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen
+locale-gen
+# -- default -- #
+# echo LANG=en_US.UTF-8 > /etc/locale.conf
+
+# -- default -- #
+# echo scrubs > /etc/hostname
 
 mkinitcpio -p linux
 useradd -m -G sys,wheel,users,adm,log -s /bin/bash scrubs
 
 echo "root:1234" | chpasswd
+echo "scrubs:1234" | chpasswd
 
-echo "
-    127.0.0.1 localhost
-    ::        localhost
-    127.0.1.1  ScrubbyHost.localdomain ScrubbyHost" > /etc/hosts
+# -- default -- #
+# echo "
+#     127.0.0.1 localhost
+#     ::        localhost
+#     127.0.1.1  scrubs.localdomain scrubs" > /etc/hosts
 
-sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /etc/sudoers
-echo "scrubs ALL=(ALL) ALL" >> /etc/sudoers
+# sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /etc/sudoers
+# echo "scrubs ALL=(ALL) ALL" >> /etc/sudoers
 
-sed -i "s/#\[multilib]/[multilib]/" /etc/pacman.conf
-sed -i "$!N;s/\(\[multilib]\n\)#\(Include\)/\1\2/;P;D" /etc/pacman.conf
+# sed -i "s/#\[multilib]/[multilib]/" /etc/pacman.conf
+# sed -i "$!N;s/\(\[multilib]\n\)#\(Include\)/\1\2/;P;D" /etc/pacman.conf
+
+# -- test -- #
+systemctl enable NetworkManager
+systemctl enable dhcpcd
+systemctl enable iwd.service 
+systemctl enable zram-swap.service
 
 pacman -Syy
 
