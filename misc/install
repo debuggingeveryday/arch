@@ -1,7 +1,5 @@
 #!/bin/bash
 
-pacman-key --init && pacman-key --populate
-
 # [ -d /sys/firmware/efi/efivars ] && BOOT_TYPE="UEFI" || BOOT_TYPE="LEGACY"
 
 # loadkeys en
