@@ -21,8 +21,11 @@ mkfs.ext4 /dev/sda2
 mount /dev/sda2 /mnt
 
 # -- test -- #
-mkdir -p /boot/efi
-mount /dev/sda1 /boot/efi
+mkdir -p /mnt/boot/efi
+mount /dev/sda1 /mnt/boot/efi
+
+ls -R /mnt/boot | grep ":$"
+read -p "Check if /boot/efi created"
 
 # -- default -- #
 # pacstrap /mnt base base-devel linux linux-firmware linux-headers
