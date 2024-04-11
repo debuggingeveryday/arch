@@ -1,10 +1,12 @@
 #!/bin/bash
 
-[ -d /sys/firmware/efi/efivars ] && BOOT_TYPE="UEFI" || BOOT_TYPE="LEGACY"
+pacman-key --init && pacman-key --populate
 
-loadkeys en
+# [ -d /sys/firmware/efi/efivars ] && BOOT_TYPE="UEFI" || BOOT_TYPE="LEGACY"
+
+# loadkeys en
 setfont ter-132b
-timedatectl
+# timedatectl
 
 umount -a
 swapoff -a
@@ -26,7 +28,6 @@ pacstrap /mnt base linux linux-firmware
 
 genfstab -U /mnt >> /mnt/etc/fstab
 
-cat /mnt/etc/fstab
-
 cp ./chroot /mnt
+
 arch-chroot /mnt /chroot
