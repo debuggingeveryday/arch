@@ -6,7 +6,7 @@ loadkeys en
 setfont ter-132b
 timedatectl
 
-umount -A --recursive /mnt
+umount -a
 swapoff -a
 wipefs --all --force /dev/sda
 sgdisk -Z /dev/sda
@@ -18,10 +18,10 @@ sgdisk -n 2::-0 --typecode=2:8300 --change-name=2:'ROOT' /dev/sda
 mkdir -p /mnt/boot/efi
 
 mkfs.fat -F32 /dev/sda1
-mount /dev/sda1 /mnt/boot/efi
-
 mkfs.ext4 /dev/sda2
+
 mount /dev/sda2 /mnt
+mount /dev/sda1 /mnt/boot/efi
 
 pacstrap /mnt base base-devel linux-lts linux-firmware
 
