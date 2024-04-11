@@ -2,7 +2,7 @@
 
 ln -sf /usr/share/zoneinfo/Asia/Manila  /etc/localtime
 hwclock --systohc --utc
-echo en_US.UTF-8 UTF-8 >> /etc/locale.gen
+sed -i 's/#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen
 locale-gen
 echo LANG=en_US.UTF-8 > /etc/locale.conf
 
@@ -27,6 +27,6 @@ sed -i "$!N;s/\(\[multilib]\n\)#\(Include\)/\1\2/;P;D" /etc/pacman.conf
 pacman -Syy
 
 pacman -S grub efibootmgr os-prober
-grub-install --target=x86_64-efi --bootloader-id=grub --efi-directory=/boot/efi
+# grub-install --target=x86_64-efi --bootloader-id=grub --efi-directory=/boot/efi
+grub-install /dev/sda
 grub-mkconfig -o /boot/grub/grub.cfg
-
