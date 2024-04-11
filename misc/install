@@ -2,9 +2,9 @@
 
 # [ -d /sys/firmware/efi/efivars ] && BOOT_TYPE="UEFI" || BOOT_TYPE="LEGACY"
 
-# loadkeys en
+loadkeys en
 setfont ter-132b
-# timedatectl
+timedatectl
 
 umount -a
 swapoff -a
