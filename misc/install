@@ -10,9 +10,6 @@ umount -a
 swapoff -a
 wipefs --all --force /dev/sda
 
-fdisk -l
-read -p "check is all cleared disk"
-
 sgdisk -Z /dev/sda
 sgdisk -a 2048 -o /dev/sda
 
@@ -27,15 +24,16 @@ mount /dev/sda2 /mnt
 mkdir -p /mnt/boot/efi
 mount /dev/sda1 /mnt/boot/efi
 
-ls -R /mnt/boot | grep ":$"
-read -p "Check if /boot/efi created"
-
 pacstrap /mnt base base-devel linux linux-firmware linux-headers grub efibootmgr os-prober
 
 # -- test -- #
 pacstrap -i /mnt --noconfirm --needed NetworkManager dhcpcd iwd
 
-echo scrubs > /etc/hostname
+echo scrubs > /mnt/etc/hostname
+
+ls /mnt/etc | grep "host"
+cat /mnt/etc/host
+read -p ""
 
 ln -sf /mnt/usr/share/zoneinfo/Asia/Manila  /mnt/etc/localtime
 
@@ -44,11 +42,25 @@ echo "
     ::        localhost
     127.0.1.1  scrubs.localdomain scrubs" > /mnt/etc/hosts
 
+ls /mnt/etc | grep "hosts"
+cat /mnt/etc/hosts
+read -p ""
+
 sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /mnt/etc/sudoers
+
 echo "scrubs ALL=(ALL) ALL" >> /mnt/etc/sudoers
+
+ls /mnt/etc | grep "sudoers"
+cat /mnt/etc/sudoers
+read -p ""
+
 
 sed -i "s/#\[multilib]/[multilib]/" /mnt/etc/pacman.conf
 sed -i "$!N;s/\(\[multilib]\n\)#\(Include\)/\1\2/;P;D" /mnt/etc/pacman.conf
+
+ls /mnt/etc | grep "pacman.conf"
+cat /mnt/etc/pacman.conf
+read -p ""
 
 swap_size="2g"
 
@@ -67,6 +79,9 @@ WantedBy=multi-user.target
 
 " > /mnt/etc/systemd/system/zram-swap.service
 
+ls /mnt/etc/systemd/system | grep "zram-swap.service"
+cat /mnt/etc/systemd/system/zram-swap.service
+read -p ""
 
 genfstab -U /mnt >> /mnt/etc/fstab
 
