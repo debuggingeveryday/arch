@@ -1,0 +1,77 @@
+loadkeys en
+setfont ter-132b
+timedatectl
+
+umount -a
+swapoff -a
+wipefs --all --force /dev/sda
+
+sgdisk -n 1::-0 --typecode=2:8300 --change-name=1:'ROOT' /dev/sda
+
+mkfs.ext4 /dev/sda1
+
+mount /dev/sda1 /mnt
+
+pacstrap -i /mnt base base-devel linux linux-firmware vim grub
+
+pacstrap -i /mnt --noconfirm --needed NetworkManager dhcpcd iwd
+
+echo scrubs > /mnt/etc/hostname
+
+ls /mnt/etc | grep "host"
+cat /mnt/etc/host
+read -p ""
+
+ln -sf /mnt/usr/share/zoneinfo/Asia/Manila  /mnt/etc/localtime
+
+echo "
+    127.0.0.1 localhost
+    ::        localhost
+    127.0.1.1  scrubs.localdomain scrubs" > /mnt/etc/hosts
+
+ls /mnt/etc | grep "hosts"
+cat /mnt/etc/hosts
+read -p ""
+
+sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /mnt/etc/sudoers
+
+echo "scrubs ALL=(ALL) ALL" >> /mnt/etc/sudoers
+
+ls /mnt/etc | grep "sudoers"
+cat /mnt/etc/sudoers
+read -p ""
+
+
+sed -i "s/#\[multilib]/[multilib]/" /mnt/etc/pacman.conf
+sed -i "$!N;s/\(\[multilib]\n\)#\(Include\)/\1\2/;P;D" /mnt/etc/pacman.conf
+
+ls /mnt/etc | grep "pacman.conf"
+cat /mnt/etc/pacman.conf
+read -p ""
+
+swap_size="1g"
+
+echo "
+[Unit]
+Description=zRam block devices swapping
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/bash -c 'modprobe zram && echo lz4 > /sys/block/zram0/comp_algorithm && echo ${swap_size} > /sys/block/zram0/disksize && mkswap --label zram0 /dev/zram0 && swapon --priority 100 /dev/zram0'
+ExecStop=/usr/bin/bash -c 'swapoff /dev/zram0 && rmmod zram'
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+
+" > /mnt/etc/systemd/system/zram-swap.service
+
+ls /mnt/etc/systemd/system | grep "zram-swap.service"
+cat /mnt/etc/systemd/system/zram-swap.service
+read -p ""
+
+genfstab -U /mnt >> /mnt/etc/fstab
+
+cp ./chroot /mnt
+
+arch-chroot /mnt /chroot
