@@ -6,6 +6,7 @@ umount -a
 swapoff -a
 wipefs --all --force /dev/sda
 
+sgdisk -Z /dev/sda
 sgdisk -n 1::-0 --typecode=1:8300 --change-name=1:'ROOT' /dev/sda
 
 mkfs.ext4 /dev/sda1
