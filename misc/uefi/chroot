@@ -41,5 +41,6 @@ systemctl enable zram-swap.service
 
 pacman -Syy
 
-grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi --removable
+# grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi --removable
+grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi
 grub-mkconfig -o /boot/grub/grub.cfg
