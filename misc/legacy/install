@@ -13,7 +13,7 @@ mkfs.ext4 /dev/sda1
 
 mount /dev/sda1 /mnt
 
-pacstrap -i /mnt base base-devel linux linux-firmware vim grub
+pacstrap -i /mnt --noconfirm --needed base base-devel linux linux-firmware vim grub
 
 pacstrap -i /mnt --noconfirm --needed NetworkManager dhcpcd iwd
 
@@ -21,7 +21,6 @@ echo scrubs > /mnt/etc/hostname
 
 ls /mnt/etc | grep "host"
 cat /mnt/etc/host
-read -p ""
 
 ln -sf /mnt/usr/share/zoneinfo/Asia/Manila  /mnt/etc/localtime
 
@@ -32,7 +31,6 @@ echo "
 
 ls /mnt/etc | grep "hosts"
 cat /mnt/etc/hosts
-read -p ""
 
 sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /mnt/etc/sudoers
 
@@ -40,7 +38,6 @@ echo "scrubs ALL=(ALL) ALL" >> /mnt/etc/sudoers
 
 ls /mnt/etc | grep "sudoers"
 cat /mnt/etc/sudoers
-read -p ""
 
 
 sed -i "s/#\[multilib]/[multilib]/" /mnt/etc/pacman.conf
@@ -48,7 +45,6 @@ sed -i "$!N;s/\(\[multilib]\n\)#\(Include\)/\1\2/;P;D" /mnt/etc/pacman.conf
 
 ls /mnt/etc | grep "pacman.conf"
 cat /mnt/etc/pacman.conf
-read -p ""
 
 swap_size="1g"
 
