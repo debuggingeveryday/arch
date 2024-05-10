@@ -1,0 +1,27 @@
+PASSWORD="1234"
+
+umount -A --recursive /mnt
+swapoff -a
+wipefs --all --force /dev/sda
+
+sgdisk -Z /dev/sda
+sgdisk -a 2048 -o /dev/sda
+
+sgdisk -n 1::+300M --typecode=1:ef00 --change-name=1:'BOOT' /dev/sda
+sgdisk -n 2::-0 --typecode=2:8e00 --change-name=2:'ROOT' /dev/sda
+
+mkfs.fat -F32 /dev/sda1
+
+echo -n "${PASSWORD}" | cryptsetup -y -v luksFormat /dev/sda2 -
+echo -n "${PASSWORD}" | cryptsetup open --type luks /dev/sda2 shingha -
+
+pvcreate /dev/mapper/shingha
+vgcreate scrubs /dev/mapper/shingha
+
+lvcreate -l 100%FREE scrubs -n ROOT
+
+mkfs.ext4 /dev/mapper/scrubs-ROOT
+mount /dev/mapper/scrubs-ROOT /mnt
+
+mkdir /mnt/boot
+mount /dev/sda1 /mnt/boot

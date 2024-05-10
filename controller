@@ -189,7 +189,8 @@ sgdisk -a 2048 -o /dev/${DISK_DRIVE}
 [[ "$BOOT_TYPE" == "EFI" ]] && disk_size="+300M"
 [[ "$BOOT_TYPE" == "LEGACY" ]] && disk_size="+1M"
 
-sgdisk -n 1::$disk_size --typecode=1:ef00 --change-name=1:'BOOT' /dev/${DISK_DRIVE} # EFI /dev/nvme0n1p1
+[[ "$BOOT_TYPE" == "EFI" ]] && sgdisk -n 1::$disk_size --typecode=1:ef00 --change-name=1:'BOOT' /dev/${DISK_DRIVE} # EFI /dev/nvme0n1p1
+[[ "$BOOT_TYPE" == "LEGACY" ]] && sgdisk -n 1::$disk_size --typecode=1:ef02 --change-name=1:'BOOT' /dev/${DISK_DRIVE} # EFI /dev/nvme0n1p1
 sgdisk -n 2::-0 --typecode=2:8e00 --change-name=2:'ROOT' /dev/${DISK_DRIVE} # FILE SYSTEM /dev/nvme0n1p3
 
 echo -n "y" | mkfs.fat -F32 ${new_disk}1
@@ -383,7 +384,8 @@ else
 mkinitcpio -p linux
 fi
 
-grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot
+[[ "$BOOT_TYPE" == "EFI" ]] && grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot
+[[ "$BOOT_TYPE" == "LEGACY" ]] && grub-install /dev/sda
 
 if [[ "$ENCRYPT_DRIVE" == true ]]; then
 STORAGE_NAME="shingha"
