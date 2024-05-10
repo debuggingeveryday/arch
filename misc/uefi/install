@@ -78,7 +78,6 @@ WantedBy=multi-user.target
 
 ls /mnt/etc/systemd/system | grep "zram-swap.service"
 cat /mnt/etc/systemd/system/zram-swap.service
-read -p ""
 
 genfstab -U /mnt >> /mnt/etc/fstab
 
