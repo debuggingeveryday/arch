@@ -7,7 +7,7 @@ loadkeys en
 # setfont ter-132b
 timedatectl
 
-if [[ "$ENCRYPT_DRIVE" == true ]] && ./partition_drive/encrypt || ./partition_drive/normal
+[[ "$ENCRYPT_DRIVE" == true ]] && ./partition_drive/encrypt || ./partition_drive/normal
 
 pacstrap /mnt --noconfirm --needed base base-devel linux linux-firmware linux-headers grub efibootmgr os-prober
 

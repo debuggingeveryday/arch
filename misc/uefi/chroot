@@ -39,9 +39,9 @@ systemctl enable zram-swap.service
 pacman -Syy
 
 # grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi --removable
-grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi
+grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot
 
-[[ "$ENCRYPT_DRIVE" == true ]]; then
+if [[ "$ENCRYPT_DRIVE" == true ]]; then
 STORAGE_NAME="shingha"
 VOLGRP="scrubs"
 new_disk="/dev/sda2"
