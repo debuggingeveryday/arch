@@ -10,8 +10,10 @@ timedatectl
 [[ "$ENCRYPT_DRIVE" == true ]] && ./partition_drive/encrypt || ./partition_drive/normal
 
 pacstrap /mnt --noconfirm --needed base base-devel linux linux-firmware linux-headers grub efibootmgr os-prober
-
 pacstrap -i /mnt --noconfirm --needed NetworkManager dhcpcd iwd
+
+[[ "$ENCRYPT_DRIVE" == true ]] && pacstrap -i /mnt --needed --noconfirm lvm2 || echo "exit"
+[[ "$ENCRYPT_DRIVE" == true ]] && sed -r -i 's/(HOOKS=)\((.*?)\)/\1(base udev autodetect modconf block keyboard encrypt lvm2 filesystems fsck)/g' /mnt/etc/mkinitcpio.conf || echo "exit"
 
 echo scrubs > /mnt/etc/hostname
 
