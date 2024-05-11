@@ -1,5 +1,5 @@
 
-ENCRYPT_DRIVE=true
+ENCRYPT_DRIVE=false
 
 loadkeys en
 #setfont ter-132b

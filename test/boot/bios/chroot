@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ENCRYPT_DRIVE=true
+ENCRYPT_DRIVE=false
 
 pacman-key --init && pacman-key --populate
 
