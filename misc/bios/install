@@ -1,3 +1,6 @@
+
+ENCRYPT_DRIVE=true
+
 loadkeys en
 #setfont ter-132b
 timedatectl
@@ -6,18 +9,13 @@ umount -A --recursive /mnt
 swapoff -a
 wipefs --all --force /dev/sda
 
-sgdisk -Z /dev/sda
-sgdisk -n 1::+1M --typecode=1:ef02 --change-name=1:'BOOT' /dev/sda
-# sgdisk -n 2::-0 --typecode=2:8300 --change-name=2:'ROOT' /dev/sda -- pc bonbon desktop
-sgdisk -n 2::-0 --typecode=2:8300 --change-name=2:'ROOT' /dev/sda
-
-mkfs.ext4 /dev/sda2
-
-mount /dev/sda2 /mnt
+[[ "$ENCRYPT_DRIVE" == true ]] && ./partition_drive/encrypt || ./partition_drive/normal
 
 pacstrap -i /mnt --noconfirm --needed base base-devel linux linux-firmware vim grub
-
 pacstrap -i /mnt --noconfirm --needed NetworkManager dhcpcd iwd
+
+[[ "$ENCRYPT_DRIVE" == true ]] && pacstrap -i /mnt --needed --noconfirm lvm2 || echo "exit"
+[[ "$ENCRYPT_DRIVE" == true ]] && sed -r -i 's/(HOOKS=)\((.*?)\)/\1(base udev autodetect modconf block keyboard encrypt lvm2 filesystems fsck)/g' /mnt/etc/mkinitcpio.conf || echo "exit"
 
 echo scrubs > /mnt/etc/hostname
 
