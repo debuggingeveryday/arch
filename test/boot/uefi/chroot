@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ENCRYPT_DRIVE=true
+[[ -f "../environment.conf" ]] && source ../environment.conf || echo "environment.conf not exists" ; exit 0
 
 pacman-key --init && pacman-key --populate
 
@@ -14,11 +14,11 @@ echo "LANG=en_US.UTF-8" > /etc/locale.conf
 
 echo scrubs > /etc/hostname
 
-mkinitcpio -p linux
+mkinitcpio -p linux$KERNEL
 useradd -m -G sys,wheel,users,adm,log -s /bin/bash scrubs
 
-echo "root:1234" | chpasswd
-echo "scrubs:1234" | chpasswd
+echo "root:${PASSWORD}" | chpasswd
+echo "scrubs:${PASSWORD}" | chpasswd
 
 echo "
     127.0.0.1 localhost
@@ -44,7 +44,7 @@ grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot
 if [[ "$ENCRYPT_DRIVE" == true ]]; then
 STORAGE_NAME="shingha"
 VOLGRP="scrubs"
-new_disk="/dev/sda2"
+new_disk="/dev/${TARGET_DISK}${TARGET_DISK_PREFIX}2"
 disk_id=$(blkid | grep "${new_disk}" | cut -d' ' -f2 | cut -d'=' -f2 | sed -e 's/"//g')
 tag="GRUB_CMDLINE_LINUX=\"\""
 value="GRUB_CMDLINE_LINUX=\"cryptdevice=UUID=$disk_id:$STORAGE_NAME root=\/dev\/mapper\/$VOLGRP-ROOT\""

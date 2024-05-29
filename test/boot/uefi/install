@@ -1,6 +1,7 @@
 #!/bin/bash
 
-ENCRYPT_DRIVE=true
+[[ ! -f "../../environment.conf" ]] && exit 0 || source ../../environment.conf && echo "source success environtment.conf"
+
 [ -d /sys/firmware/efi/efivars ] && BOOT_TYPE="UEFI" || BOOT_TYPE="LEGACY"
 
 loadkeys en
@@ -9,8 +10,9 @@ timedatectl
 
 [[ "$ENCRYPT_DRIVE" == true ]] && ./partition_drive/encrypt || ./partition_drive/normal
 
-pacstrap /mnt --noconfirm --needed base base-devel linux linux-firmware linux-headers grub efibootmgr os-prober
-pacstrap -i /mnt --noconfirm --needed NetworkManager dhcpcd iwd
+
+pacstrap /mnt --noconfirm --needed base base-devel linux$KERNEL linux-firmware linux$KERNEL-headers grub efibootmgr os-prober
+pacstrap -i /mnt --noconfirm --needed networkmanager dhcpcd iwd
 
 [[ "$ENCRYPT_DRIVE" == true ]] && pacstrap -i /mnt --needed --noconfirm lvm2 || echo "exit"
 [[ "$ENCRYPT_DRIVE" == true ]] && sed -r -i 's/(HOOKS=)\((.*?)\)/\1(base udev autodetect modconf block keyboard encrypt lvm2 filesystems fsck)/g' /mnt/etc/mkinitcpio.conf || echo "exit"
@@ -37,14 +39,13 @@ echo "scrubs ALL=(ALL) ALL" >> /mnt/etc/sudoers
 ls /mnt/etc | grep "sudoers"
 cat /mnt/etc/sudoers
 
-
 sed -i "s/#\[multilib]/[multilib]/" /mnt/etc/pacman.conf
 sed -i "$!N;s/\(\[multilib]\n\)#\(Include\)/\1\2/;P;D" /mnt/etc/pacman.conf
 
 ls /mnt/etc | grep "pacman.conf"
 cat /mnt/etc/pacman.conf
 
-swap_size="2g"
+swap_size="${SWAP_SIZE}"
 
 echo "
 [Unit]
