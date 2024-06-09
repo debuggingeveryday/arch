@@ -1,6 +1,7 @@
 #!/bin/sh
 
-umount -A --recursive /mnt
+umount -a
+# umount -A --recursive /mnt
 swapoff -a
 wipefs --all --force /dev/sda
 
