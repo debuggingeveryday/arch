@@ -1,6 +1,11 @@
 #!/bin/bash
 
-[[ -f "../environment.conf" ]] && source ../environment.conf || echo "environment.conf not exists" ; exit 0
+if [[ -f "./environment.conf" ]]; then
+ source ./environment.conf
+else
+ echo "environment.conf not exists"
+ exit 0
+fi
 
 pacman-key --init && pacman-key --populate
 

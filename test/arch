@@ -1,0 +1,16 @@
+
+declare -r MAIN_PATH=$PWD
+
+source ./bin/bin.sh
+
+# -- my command --
+# ./arch --username user --password 1234 --hostname mynetdotnet --kernel hardened --settings 0 --target_disk /dev/sda --is_encrypt true --timezone Asia/Manila
+
+declare -r DEBUG=true
+
+input_arguments $@
+system_variables
+source .env
+[[ ! $DEBUG ]] && populate_keyring
+set_date
+[[ ! $DEBUG ]] && partition $TARGET_DISK $IS_ENCRYPT

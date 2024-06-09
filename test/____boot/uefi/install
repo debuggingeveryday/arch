@@ -67,6 +67,7 @@ cat /mnt/etc/systemd/system/zram-swap.service
 
 genfstab -U /mnt >> /mnt/etc/fstab
 
+cp ../../environment.conf /mnt
 cp ./chroot /mnt
 
 arch-chroot /mnt /chroot
