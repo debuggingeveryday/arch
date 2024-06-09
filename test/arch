@@ -13,12 +13,13 @@ populate_keyring
 set_date
 partition
 
-loadkeys us # -- not created bin file
+# loadkeys us # -- not created bin file
 base_package
 
 # core
 modify_files
 core_packages
 start_services
+
 user_manage
 grub_install

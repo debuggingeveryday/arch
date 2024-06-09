@@ -8,7 +8,7 @@ grub_install() {
     
     if [[ -z "$kernel" ]]; then
         remote mkinitcpio -p linux-$kernel
-    elif
+    else
         remote mkinitcpio -p linux
     fi
 
