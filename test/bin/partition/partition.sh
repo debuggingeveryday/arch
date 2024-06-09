@@ -1,10 +1,9 @@
 #!/bin/sh
 
 partition() {
-    $is_encrypt=$2
-    if [[ $is_encrypt ]]; then
-        $MAIN_PATH/bin/partition/encrypt.sh
+    if [[ "$is_encrypt" == true ]]; then
+        $MAIN_PATH/bin/partition/encrypt.sh $target_disk $password
     else
-        $MAIN_PATH/bin/partition/normal.sh
+        $MAIN_PATH/bin/partition/normal.sh $target_disk
     fi
 }

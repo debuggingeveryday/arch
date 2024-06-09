@@ -2,16 +2,16 @@
 
 update_env() {
     variable=$1
-    old_value=$(cat .env | grep "$variable" | cut -d'=' -f2)
+    old_value=$(cat variable.conf | grep "$variable" | cut -d'=' -f2)
     new_value=$2
 
-    if [[ -f ".env" ]]; then
-        if  [[ $( cat .env | grep "$variable=" ) ]]; then
-            sed -i "s|'$variable=$old_value'|$variable=$new_value|g" .env
+    if [[ -f "variable.conf" ]]; then
+        if  [[ $( cat variable.conf | grep "$variable=" ) ]]; then
+            sed -i "s|'$variable=$old_value'|$variable=$new_value|g" variable.conf
         else
-            echo "$variable=$new_value" >> .env
+            echo "$variable=$new_value" >> variable.conf
         fi
     else
-        echo "$1=$2" >> .env
+        echo "$1=$2" >> variable.conf
     fi
 }

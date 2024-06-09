@@ -1,6 +1,6 @@
 #!/bin/bash
 
-[[ ! -f "../../environment.conf" ]] && exit 0 || source ../../environment.conf && echo "source success environtment.conf"
+[[ ! -f "../../variable.conf" ]] && echo "Error 1" ; exit 1 || source ../../variable.conf && echo "source success variable.conf"
 
 [ -d /sys/firmware/efi/efivars ] && BOOT_TYPE="UEFI" || BOOT_TYPE="LEGACY"
 
@@ -67,7 +67,7 @@ cat /mnt/etc/systemd/system/zram-swap.service
 
 genfstab -U /mnt >> /mnt/etc/fstab
 
-cp ../../environment.conf /mnt
+cp ../../variable.conf /mnt
 cp ./chroot /mnt
 
 arch-chroot /mnt /chroot

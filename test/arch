@@ -1,3 +1,4 @@
+#!/bin/sh
 
 declare -r MAIN_PATH=$PWD
 
@@ -8,7 +9,6 @@ source ./bin/bin.sh
 
 input_arguments $@
 system_variables
-# source .env
 populate_keyring
 set_date
 partition $target_disk $is_encrypt
