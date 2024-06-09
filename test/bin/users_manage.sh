@@ -1,8 +1,9 @@
 #!/bin/sh
 
-user_manage() {
-    arch-chroot /mnt useradd -m -G sys,wheel,users,adm,log -s /bin/bash scrubs
+source $MAIN_PATH/util/remote.sh
 
-    arch-chroot /mnt echo "root:${password}" | chpasswd
-    arch-chroot /mnt echo "scrubs:${password}" | chpasswd
+user_manage() {
+    remote useradd -m -G sys,wheel,users,adm,log -s /bin/bash scrubs
+    remote echo "root:${password}" | chpasswd
+    remote echo "scrubs:${password}" | chpasswd
 }
