@@ -1,28 +1,4 @@
 #!/bin/bash
 
-pacman-key --init && pacman-key --populate
-
-mkdir -p ./boot/bios/partition_drive
-mkdir -p ./boot/uefi/partition_drive
-
-URL="http://192.168.0.16:8000"
-
-curl -X GET $URL/environment.conf -o environment.conf
-
-# uefi
-
-curl -X GET $URL/boot/uefi/install -o ./boot/uefi/install && chmod +x ./boot/uefi/install
-curl -X GET $URL/boot/uefi/chroot -o ./boot/uefi/chroot && chmod +x ./boot/uefi/chroot
-
-curl -X GET $URL/boot/uefi/partition_drive/encrypt -o ./boot/uefi/partition_drive/encrypt && chmod +x ./boot/uefi/partition_drive/encrypt
-curl -X GET $URL/boot/uefi/partition_drive/normal -o ./boot/uefi/partition_drive/normal && chmod +x ./boot/uefi/partition_drive/normal
-
-# bios
-
-curl -X GET $URL/boot/bios/install -o ./boot/bios/install && chmod +x ./boot/bios/install
-curl -X GET $URL/boot/bios/chroot -o ./boot/bios/chroot && chmod +x ./boot/bios/chroot
-
-curl -X GET $URL/boot/bios/partition_drive/encrypt -o ./boot/bios/partition_drive/encrypt && chmod +x ./boot/bios/partition_drive/encrypt
-curl -X GET $URL/boot/bios/partition_drive/normal -o ./boot/bios/partition_drive/normal && chmod +x ./boot/bios/partition_drive/normal
-
-sh -c "./boot/uefi/install"
+echo -n "" | mount --mkdir -t cifs //192.168.0.16/public ./smb_share
+cd smb_share/arch/test

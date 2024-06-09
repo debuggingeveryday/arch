@@ -1,14 +1,24 @@
 #!/bin/sh
 
-declare -r MAIN_PATH=$PWD
+export MAIN_PATH=$PWD
 
 source ./bin/bin.sh
 
 # -- my command --
-# ./arch --username user --password 1234 --hostname mynetdotnet --kernel hardened --settings 0 --target_disk /dev/sda --is_encrypt true --timezone Asia/Manila
+# ./arch --username "user" --password "1234" --hostname mynetdotnet --kernel hardened --settings 0 --target_disk /dev/sda --is_encrypt true --timezone Asia/Manila
 
 input_arguments $@
 system_variables
 populate_keyring
 set_date
-partition $target_disk $is_encrypt
+partition
+
+loadkeys us # -- not created bin file
+base_package
+
+# core
+modify_files
+core_packages
+start_services
+user_manage
+grub_install

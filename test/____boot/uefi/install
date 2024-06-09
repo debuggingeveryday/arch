@@ -10,7 +10,6 @@ timedatectl
 
 [[ "$ENCRYPT_DRIVE" == true ]] && ./partition_drive/encrypt || ./partition_drive/normal
 
-
 pacstrap /mnt --noconfirm --needed base base-devel linux$KERNEL linux-firmware linux$KERNEL-headers grub efibootmgr os-prober
 pacstrap -i /mnt --noconfirm --needed networkmanager dhcpcd iwd
 

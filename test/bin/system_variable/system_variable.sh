@@ -14,12 +14,13 @@ declare -A variables
 variables=(
     [CPU_TYPE]=$cpu_type 
     [GPU_TYPE]=$gpu_type 
-    [TOTAL_RAM]=$total_ram
+    [RAM_SIZE]=$swap_size
     [BOOT_TYPE]=$boot_type
     [HAS_WIFI]=$has_wifi
 )
 
 for item in ${!variables[@]}; do
+    export "$key"="${variables[$item]}"
     update_env "$item" "${variables[$item]}"
 done
 }
