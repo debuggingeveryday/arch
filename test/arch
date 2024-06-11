@@ -7,19 +7,32 @@ source ./bin/bin.sh
 # -- my command --
 # ./arch --username "user" --password "1234" --hostname mynetdotnet --kernel hardened --settings 0 --target_disk /dev/sda --is_encrypt true --timezone Asia/Manila
 
-input_arguments $@
-system_variables
-populate_keyring
-set_date
-partition
+loadkeys us # -- not created bin file
 
-# loadkeys us # -- not created bin file
-base_package
+input_arguments $@ 
 
-# core
-modify_files
-core_packages
-start_services
+declare -a scripts=(
+    system_variables 
+    populate_keyring 
+    set_date 
+    partition 
+    base_package 
+    # -- core ---
+    modify_files 
+    core_packages 
+    start_services 
+    # -- error -- # 
+    user_manage 
+    grub_install
+)
 
-user_manage
-grub_install
+add_pause=false
+
+declare -a count=0
+for script in ${scripts[@]}; do
+    count=$(($count+1))
+
+    $script # excted from functions
+
+   [[ $add_pause == true ]] && read -p "** ${count} - ${script} **"
+done

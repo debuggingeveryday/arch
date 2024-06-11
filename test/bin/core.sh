@@ -1,7 +1,5 @@
 #!/bin/sh
 
-source $MAIN_PATH/util/remote.sh
-
 modify_files() {
     [[ "$is_encrypt" == true ]] && sed -r -i 's/(HOOKS=)\((.*?)\)/\1(base udev autodetect modconf block keyboard encrypt lvm2 filesystems fsck)/g' /mnt/etc/mkinitcpio.conf || echo "exit"
 
@@ -67,8 +65,8 @@ core_packages() {
 }
 
 start_services() {
-    remote systemctl enable NetworkManager.service
-    remote systemctl enable dhcpcd.service
-    remote systemctl enable iwd.service
-    remote systemctl enable zram-swap.service ;
+    arch-chroot /mnt systemctl enable NetworkManager.service
+    arch-chroot /mnt systemctl enable dhcpcd.service
+    arch-chroot /mnt systemctl enable iwd.service
+    arch-chroot /mnt systemctl enable zram-swap.service ;
 }

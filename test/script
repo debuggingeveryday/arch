@@ -1,4 +1,0 @@
-#!/bin/bash
-
-echo -n "" | mount --mkdir -t cifs //192.168.0.16/public ./smb_share
-cd smb_share/arch/test

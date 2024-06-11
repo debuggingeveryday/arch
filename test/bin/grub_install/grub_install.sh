@@ -2,21 +2,30 @@
 
 source $MAIN_PATH/bin/grub_install/load_uefi.sh
 source $MAIN_PATH/bin/grub_install/load_bios.sh
-source $MAIN_PATH/util/remote.sh
 
-grub_install() {
-    
+mkinitcpio() {
+
     if [[ -z "$kernel" ]]; then
-        remote mkinitcpio -p linux-$kernel
+        arch-chroot /mnt mkinitcpio -p linux-$kernel
     else
-        remote mkinitcpio -p linux
+        arch-chroot /mnt mkinitcpio -p linux
     fi
+}
 
+grub_mkconfig() {
+    arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
+}
+
+load_system() {
     if [[ "$boot_type" == "UEFI" ]]; then
         load_uefi
     elif [[ "$boot_type" == "BIOS" ]]; then
         load_bios
     fi
+}
 
-    remote grub-mkconfig -o /boot/grub/grub.cfg
+grub_install() {
+    mkinitcpio
+    load_system
+    grub_mkconfig
 }

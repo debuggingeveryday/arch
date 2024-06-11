@@ -1,9 +1,9 @@
 #!/bin/sh
 
-source $MAIN_PATH/util/remote.sh
+source $MAIN_PATH/util/debug.sh
 
 user_manage() {
-    remote useradd -m -G sys,wheel,users,adm,log -s /bin/bash scrubs
-    cp $MAIN_PATH/bin/user_manage/user_manage.sh /mnt
-    remote ./user_manage.sh
+    arch-chroot /mnt useradd -m -G sys,wheel,users,adm,log -s /bin/bash ${username}
+    arch-chroot /mnt /bin/bash -c "echo 'root:${password}' | chpasswd"
+    arch-chroot /mnt /bin/bash -c "echo '${username}:${password}' | chpasswd"
 }

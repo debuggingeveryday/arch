@@ -1,7 +1,5 @@
 #!/bin/sh
 
-source $MAIN_PATH/util/remote.sh
-
 load_bios() {
-    remote grub-install /dev/sda
+    arch-chroot /mnt grub-install /dev/sda
 }
