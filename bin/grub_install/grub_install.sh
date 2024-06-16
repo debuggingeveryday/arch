@@ -5,7 +5,7 @@ source $MAIN_PATH/bin/grub_install/load_bios.sh
 
 mkinitcpio() {
 
-    if [[ -z "$kernel" ]]; then
+    if [[ -n "$kernel" ]]; then
         arch-chroot /mnt mkinitcpio -p linux-$kernel
     else
         arch-chroot /mnt mkinitcpio -p linux
