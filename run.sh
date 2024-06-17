@@ -1,11 +1,11 @@
 #!/bin/sh
 
 ./arch \
-    --username user \
-    --password 1234 \
-    --hostname mynetdotnet \
+    --username scrubs \
+    --password Iskaramaal1! \
+    --hostname shinghadotnet \
     --settings 0 \
-    --target_disk /dev/sda \
-    --is_encrypt false \
+    --target_disk /dev/nvme0n1 \
+    --is_encrypt true \
     --timezone Asia/Manila \
     --kernel hardened \

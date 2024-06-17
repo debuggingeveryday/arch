@@ -7,7 +7,7 @@ normal_partition() {
     local -r disk=$(echo "${ARCH_TARGET_DISK}" | sed "s/\// /g")
     local -r disk_name_tag=$(echo "$disk" | awk '{print $1}')
     local -r disk_name_target=$(echo "$disk" | awk '{print $2}')
-    local -r disk_target_prefix=""
+    local disk_target_prefix=""
 
     if [[ "$disk_name_target" == "nvme0n1" ]]; then
         disk_target_prefix="p"

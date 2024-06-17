@@ -29,7 +29,7 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
-local -a scripts=(
+declare -a scripts=(
     system_variables 
     check_environment_variables 
     populate_keyring 
@@ -47,7 +47,7 @@ local -a scripts=(
 
 add_pause=false
 
-local -i count=0
+declare -i count=0
 
 echo "" > logfile.txt
 

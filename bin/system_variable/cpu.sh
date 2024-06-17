@@ -1,9 +1,9 @@
 #!/bin/sh
 
 if [[ $(lscpu | grep -E "GenuineIntel") ]]; then
-    local -r cpu_type="INTEL"
+    declare -r cpu_type="INTEL"
 elif [[ $(lscpu | grep -E "AuthenticAMD") ]]; then
-    local -r cpu_type="AMD"
+    declare -r cpu_type="AMD"
 else
-    local -r cpu_type="--"
+    declare -r cpu_type="--"
 fi

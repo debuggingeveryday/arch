@@ -1,14 +1,13 @@
 #!/bin/sh
 
 source $MAIN_PATH/util/update_env.sh
+source $MAIN_PATH/bin/system_variable/ram.sh
+source $MAIN_PATH/bin/system_variable/wifi.sh
+source $MAIN_PATH/bin/system_variable/cpu.sh
+source $MAIN_PATH/bin/system_variable/gpu.sh
+source $MAIN_PATH/bin/system_variable/verify_boot.sh
 
 function system_variables() {
-    source $MAIN_PATH/bin/system_variable/ram.sh
-    source $MAIN_PATH/bin/system_variable/wifi.sh
-    source $MAIN_PATH/bin/system_variable/cpu.sh
-    source $MAIN_PATH/bin/system_variable/gpu.sh
-    source $MAIN_PATH/bin/system_variable/verify_boot.sh
-
     local -A variables
 
     variables=(
@@ -20,8 +19,8 @@ function system_variables() {
     )
 
     for item in ${!variables[@]}; do
-        local -r key="$item"
-        local -r value="${variables[$item]}"
+        key="$item"
+        value="${variables[$item]}"
         update_env "$item" "${value}"
         export "$key"="$value"
     done
