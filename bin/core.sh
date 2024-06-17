@@ -1,13 +1,13 @@
 #!/bin/sh
 
 modify_files() {
-    [[ "$is_encrypt" == true ]] && sed -r -i 's/(HOOKS=)\((.*?)\)/\1(base udev autodetect modconf block keyboard encrypt lvm2 filesystems fsck)/g' /mnt/etc/mkinitcpio.conf || echo "exit"
+    [[ "$ARCH_IS_ENCRYPT" == true ]] && sed -r -i 's/(HOOKS=)\((.*?)\)/\1(base udev autodetect modconf block keyboard encrypt lvm2 filesystems fsck)/g' /mnt/etc/mkinitcpio.conf || echo "exit"
 
     # hostname
     echo "scrubs" > /mnt/etc/hostname
 
     # timezone
-    ln -sf /mnt/usr/share/zoneinfo/$timezone  /mnt/etc/localtime
+    ln -sf /mnt/usr/share/zoneinfo/$ARCH_TIMEZONE  /mnt/etc/localtime
 
     # hosts
     echo "
@@ -30,7 +30,7 @@ modify_files() {
 
     [Service]
     Type=oneshot
-    ExecStart=/usr/bin/bash -c 'modprobe zram && echo lz4 > /sys/block/zram0/comp_algorithm && echo ${swap_size} > /sys/block/zram0/disksize && mkswap --label zram0 /dev/zram0 && swapon --priority 100 /dev/zram0'
+    ExecStart=/usr/bin/bash -c 'modprobe zram && echo lz4 > /sys/block/zram0/comp_algorithm && echo ${ARCH_RAM_SIZE} > /sys/block/zram0/disksize && mkswap --label zram0 /dev/zram0 && swapon --priority 100 /dev/zram0'
     ExecStop=/usr/bin/bash -c 'swapoff /dev/zram0 && rmmod zram'
     RemainAfterExit=yes
 
@@ -50,12 +50,17 @@ core_packages() {
     local packages=(
         "networkmanager" 
         "dhcpcd" 
-        "iwd" 
         "vim" 
         "git" 
     )
+
+    if [[ "$ARCH_HAS_WIFI" == true  ]]; then
+        packages+=(
+            "iwd" 
+        )
+    fi
     
-    if [[ "$is_encrypt" == true ]]; then
+    if [[ "$ARCH_IS_ENCRYPT" == true ]]; then
         packages+=(
             "lvm2" 
         )
@@ -67,6 +72,8 @@ core_packages() {
 start_services() {
     arch-chroot /mnt systemctl enable NetworkManager.service
     arch-chroot /mnt systemctl enable dhcpcd.service
-    arch-chroot /mnt systemctl enable iwd.service
+    if [[ "$ARCH_HAS_WIFI" == true ]]; then
+        arch-chroot /mnt systemctl enable iwd.service
+    fi
     arch-chroot /mnt systemctl enable zram-swap.service ;
 }

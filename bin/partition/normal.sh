@@ -1,13 +1,17 @@
 #!/bin/sh
 
 # -- split string -- #
+source $MAIN_PATH/util/debug.sh
 
 normal_partition() {
-    IFS="/"
-    read -a disk <<< $target_disk
+    local -r disk=$(echo "${ARCH_TARGET_DISK}" | sed "s/\// /g")
+    local -r disk_name_tag=$(echo "$disk" | awk '{print $1}')
+    local -r disk_name_target=$(echo "$disk" | awk '{print $2}')
+    local -r disk_target_prefix=""
 
-    disk_name_tag="${disk[1]}"
-    disk_name_target="${disk[2]}"
+    if [[ "$disk_name_target" == "nvme0n1" ]]; then
+        disk_target_prefix="p"
+    fi
 
     umount -a
     umount -A --recursive /mnt
@@ -21,12 +25,12 @@ normal_partition() {
     # sgdisk -n 2::-0 --typecode=2:8300 --change-name=2:'ROOT' /dev/sda -- pc bonbon desktop
     sgdisk -n 2::-0 --typecode=2:8304 --change-name=2:'ROOT' /$disk_name_tag/$disk_name_target
 
-    mkfs.fat -F32 /${disk_name_tag}/${disk_name_target}1
-    mkfs.ext4 /${disk_name_tag}/${disk_name_target}2
+    mkfs.fat -F32 /${disk_name_tag}/${disk_name_target}${disk_target_prefix}1
+    mkfs.ext4 /${disk_name_tag}/${disk_name_target}${disk_target_prefix}2
 
-    mount /${disk_name_tag}/${disk_name_target}2 /mnt
+    mount /${disk_name_tag}/${disk_name_target}${disk_target_prefix}2 /mnt
 
     mkdir -p /mnt/boot
-    mount /${disk_name_tag}/${disk_name_target}1 /mnt/boot
+    mount /${disk_name_tag}/${disk_name_target}${disk_target_prefix}1 /mnt/boot
 
 }

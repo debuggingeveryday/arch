@@ -2,13 +2,13 @@
 
 # define gpu type
 if [[ $(lspci | grep -E "NVIDIA|GeForce") ]]; then
-    gpu_type="NVIDIA"
+    local -r gpu_type="NVIDIA"
 elif [[ $(lspci | grep -E "Radeon|AMD") ]]; then
-    gpu_type="AMD"
+    local -r gpu_type="AMD"
 elif [[ $(lspci | grep -E "Integrated Graphics Controller") ]]; then
-    gpu_type="INTEL_GRAPHICS"
+    local -r gpu_type="INTEL_GRAPHICS"
 elif [[ $(lspci | grep -E "Intel Corporation UHD") ]]; then
-    gpu_type="INTEL_UHD"
+    local -r gpu_type="INTEL_UHD"
 else
-    gpu_type="--"
+    local -r gpu_type="--"
 fi

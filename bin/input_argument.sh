@@ -1,7 +1,5 @@
 #!/bin/sh
 
-
-source $MAIN_PATH/bash_modules/bash_modules.sh
 source $MAIN_PATH/util/update_env.sh
 
 input_arguments () {
@@ -31,7 +29,7 @@ input_arguments () {
     define_arg "username" "" "Enter a username" "string" "true"
     define_arg "password" "" "Enter a password" "string" "true"
     define_arg "hostname" "" "Enter a hostname" "string" "true"
-    define_arg "kernel" "" "Enter a hostname" "string" "true"
+    define_arg "kernel" "" "Enter a hostname" "string" "false"
     define_arg "settings" "0" "Enter a settings" "integer" "true"
     define_arg "target_disk" "" "Enter a target disk" "string" "true"
     define_arg "is_encrypt" "" "Enter a encrypt" "string" "true"
@@ -47,11 +45,24 @@ input_arguments () {
 
     # Store to config
 
-    declare -A variables
+    local -A variables
 
-    variables=([USERNAME]=$username [PASSWORD]=$password [HOSTNAME]=$hostname [KERNEL]=$kernel [SETTINGS]=$settings [TARGET_DISK]=$target_disk [IS_ENCRYPT]=$is_encrypt [TIMEZONE]=$timezone)
+    variables=(
+        [USERNAME]=$username 
+        [PASSWORD]=$password 
+        [HOSTNAME]=$hostname 
+        [KERNEL]=$kernel 
+        [SETTINGS]=$settings 
+        [TARGET_DISK]=$target_disk 
+        [IS_ENCRYPT]=$is_encrypt 
+        [TIMEZONE]=$timezone
+    )
 
     for item in ${!variables[@]}; do
-       update_env "$item" "${variables[$item]}"
+        if [[ -n "$item" ]]; then
+            update_env "$item" "${variables[$item]}"
+        else
+            update_env "$item" "--"
+        fi
     done
 }

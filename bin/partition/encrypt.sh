@@ -3,11 +3,14 @@
 # -- split string -- #
 
 encrypt_partition() {
-    IFS="/"
-    read -a disk <<< $target_disk
-    
-    disk_name_tag="${disk[1]}"
-    disk_name_target="${disk[2]}"
+    local -r disk=$(echo "${ARCH_TARGET_DISK}" | sed "s/\// /g")
+    local -r disk_name_tag=$(echo "$disk" | awk '{print $1}')
+    local -r disk_name_target=$(echo "$disk" | awk '{print $2}')
+    local -r disk_target_prefix=""
+
+    if [[ "$disk_name_target" == "nvme0n1" ]]; then
+        disk_target_prefix="p"
+    fi
     
     umount -A --recursive /mnt
     swapoff -a
@@ -36,6 +39,5 @@ encrypt_partition() {
     mkdir -p /mnt/boot
     mount /${disk_name_tag}/${disk_name_target}${disk_target_prefix}1 /mnt/boot
 
-    lsblk
-    read -p "check disk /mnt/boot is mounted?"
+    # read -p "check disk /mnt/boot is mounted?"
 }

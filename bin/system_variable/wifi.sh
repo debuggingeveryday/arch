@@ -2,5 +2,7 @@
 
 # if wireless device exist
 if [[ $(grep -E "Wireless" <<< $(lspci)) || $(grep -E "Wireless" <<< $(lsusb)) ]]; then
-    has_wifi=yes
+    local -r has_wifi=yes
+else
+    local -r has_wifi=--
 fi

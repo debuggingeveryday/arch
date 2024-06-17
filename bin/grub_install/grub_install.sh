@@ -4,9 +4,8 @@ source $MAIN_PATH/bin/grub_install/load_uefi.sh
 source $MAIN_PATH/bin/grub_install/load_bios.sh
 
 mkinitcpio() {
-
-    if [[ -n "$kernel" ]]; then
-        arch-chroot /mnt mkinitcpio -p linux-$kernel
+    if [[ -n "$ARCH_KERNEL" ]]; then
+        arch-chroot /mnt mkinitcpio -p linux-$ARCH_KERNEL
     else
         arch-chroot /mnt mkinitcpio -p linux
     fi
@@ -17,9 +16,9 @@ grub_mkconfig() {
 }
 
 load_system() {
-    if [[ "$boot_type" == "UEFI" ]]; then
+    if [[ "$ARCH_BOOT_TYPE" == "UEFI" ]]; then
         load_uefi
-    elif [[ "$boot_type" == "BIOS" ]]; then
+    elif [[ "$ARCH_BOOT_TYPE" == "BIOS" ]]; then
         load_bios
     fi
 }
