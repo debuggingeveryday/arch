@@ -20,7 +20,10 @@ declare -a scripts=(
     modify_files 
     core_packages 
     start_services 
-    # -- error -- # 
+    # -- window manager -- #
+    bspwm_sxhkd 
+    alacritty_legasture 
+    
     user_manage 
     grub_install
 )

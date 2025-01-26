@@ -1,0 +1,23 @@
+colors:
+  primary:
+    background: '#14161B'
+
+window:
+  padding:
+    x: 10
+    y: 10
+
+font:
+  size: 8.0
+  
+  normal:
+    family: Fira Code
+    style: Regular
+
+  bold:
+    family: Fira Code
+    style: Bold
+  
+  italic:
+    family: Fira Code
+    style: Italic
