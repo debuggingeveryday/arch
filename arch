@@ -7,11 +7,10 @@ source ./bin/bin.sh
 # -- my command --
 # ./arch --username "user" --password "1234" --hostname mynetdotnet --kernel hardened --settings 0 --target_disk /dev/sda --is_encrypt true --timezone Asia/Manila
 
-loadkeys us # -- not created bin file
-
 input_arguments $@ 
 
 declare -a scripts=(
+    load_keyboard_setting
     system_variables 
     populate_keyring 
     set_date 

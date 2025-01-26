@@ -9,3 +9,4 @@ source $MAIN_PATH/bin/base_package.sh
 source $MAIN_PATH/bin/core.sh
 source $MAIN_PATH/bin/grub_install/grub_install.sh
 source $MAIN_PATH/bin/user_manage/user_manage.sh
+source $MAIN_PATH/bin/keyboard.sh
