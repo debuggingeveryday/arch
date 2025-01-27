@@ -2,10 +2,10 @@
 background () {
     pacman -Sy feh
     
-    mkdir -p $HOME/feh
-    cp $MAIN_PATH/window_manager/file_config/background/background-1.jpg $HOME/feh/background.jpg
+    mkdir -p $DUMP_FILES_PATH/feh
+    cp $MAIN_PATH/window_manager/file_config/background/background-1.jpg $DUMP_FILES_PATH/feh/background.jpg
 
     echo "
-        feh --bg-scale $HOME/feh/background.jpg
+        feh --bg-scale $DUMP_FILES_PATH/feh/background.jpg
         " >> ~/.bash_profile
 }

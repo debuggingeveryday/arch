@@ -1,6 +1,9 @@
 #!/bin/sh
 
-export MAIN_PATH=$PWD
+export MAIN_PATH="$PWD"
+
+mkdir $HOME/DUMP_FILES
+export DUMP_FILES_PATH="$HOME/DUMP_FILES"
 
 source ./bin/bin.sh
 

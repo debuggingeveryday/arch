@@ -3,13 +3,13 @@
 
 alacritty_legasture () {
   # update ligature alacritty
-  git clone https://github.com/zenixls2/alacritty $HOME/alacritty &&
-  cd $HOME/alacritty && 
-  git checkout ligature && 
+  # git clone --single-branch --branch <branchname> <remote-repo>
+  git clone --single-branch --branch ligasture https://github.com/zenixls2/alacritty  $DUMP_FILES_PATH/alacritty &&
+  cd $DUMP_FILES_PATH/alacritty &&  
   cargo build --release &&
   sudo mv /usr/bin/alacritty /usr/bin/alacritty.bak &&
-  sudo cp $HOME/alacritty/target/release/alacritty /usr/bin &&
+  sudo cp $DUMP_FILES_PATH/alacritty/target/release/alacritty /usr/bin &&
 
-  cp $HOME/.config/alacritty/alacritty.toml $HOME/.config/alacritty/alacritty.toml.bak &&
-  cp -f $HOME/window-manager/files_config/alacritty.yml $HOME/.config/alacritty/alacritty.yml
+  cp $DUMP_FILES_PATH/.config/alacritty/alacritty.toml $DUMP_FILES_PATH/.config/alacritty/alacritty.toml.bak &&
+  cp -f $DUMP_FILES_PATH/window-manager/files_config/alacritty.yml $DUMP_FILES_PATH/.config/alacritty/alacritty.yml
 }

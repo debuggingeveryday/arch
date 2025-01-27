@@ -36,6 +36,6 @@ encrypt_partition() {
     mkdir -p /mnt/boot
     mount /${disk_name_tag}/${disk_name_target}${disk_target_prefix}1 /mnt/boot
 
-    lsblk
-    read -p "check disk /mnt/boot is mounted?"
+    # lsblk
+    # read -p "check disk /mnt/boot is mounted?"
 }
