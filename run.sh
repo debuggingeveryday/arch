@@ -1,4 +1,8 @@
-./arch --username "user" \
+#!/bin/sh
+
+./install_bash_modules.sh
+
+./arch.sh --username "user" \
  --password "1234" \
  --hostname mynetdotnet \
  --kernel lts \
