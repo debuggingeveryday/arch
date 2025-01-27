@@ -18,5 +18,5 @@ eww_bar () {
 
     echo "
     $(cd $HOME/Desktop/widgets && ./eww.sh) &
-    " >> ~/.bash_profile &&
+    " >> ~/.bash_profile
 }
