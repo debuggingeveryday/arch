@@ -1,7 +1,7 @@
 #!/bin/sh
 
 eww_bar () {
-    sudo pacman -Sy rust libdbusmenu-glib libdbusmenu-gtk3 &&
+    sudo pacman -Sy --noconfirm --needed rust libdbusmenu-glib libdbusmenu-gtk3 &&
 
     git clone https://github.com/elkowar/eww $DUMP_FILES_PATH/eww-bar &&
     cd $DUMP_FILES_PATH/eww-bar &&

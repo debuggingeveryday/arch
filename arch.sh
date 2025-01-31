@@ -22,13 +22,10 @@ declare -a scripts=(
     # -- core ---
     modify_files 
     core_packages 
-    start_services 
-    # -- window manager -- #
-    bspwm_sxhkd 
-    alacritty_legasture 
-    
+    start_services     
     user_manage 
-    grub_install
+    # -- window manager -- #
+    # grub_install
 )
 
 add_pause=false

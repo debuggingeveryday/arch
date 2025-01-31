@@ -9,4 +9,4 @@
  --settings 0 \
  --target_disk /dev/sda \
  --is_encrypt true \
- --timezone Asia/Manila
+ --timezone Asia/Manila \
