@@ -25,7 +25,8 @@ declare -a scripts=(
     start_services     
     user_manage 
     # -- window manager -- #
-    # grub_install
+    window_manager
+    grub_install 
 )
 
 add_pause=false
