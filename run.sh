@@ -8,5 +8,5 @@
  --kernel lts \
  --settings 0 \
  --target_disk /dev/sda \
- --is_encrypt true \
+ --is_encrypt false \
  --timezone Asia/Manila \
