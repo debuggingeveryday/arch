@@ -11,7 +11,7 @@ load_uefi() {
     
     disk_name_tag="${disk[1]}"
     disk_name_target="${disk[2]}"
-    target_disk_prefix=""
+    target_disk_prefix="p"
 
     storage_name="shingha"
     volgrp="scrubs"

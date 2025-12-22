@@ -8,7 +8,8 @@ encrypt_partition() {
     
     disk_name_tag="${disk[1]}"
     disk_name_target="${disk[2]}"
-    
+    disk_target_prefix="p"
+
     umount -A --recursive /mnt
     swapoff -a
     
