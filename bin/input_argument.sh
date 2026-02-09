@@ -31,7 +31,7 @@ input_arguments () {
     define_arg "username" "" "Enter a username" "string" "true"
     define_arg "password" "" "Enter a password" "string" "true"
     define_arg "hostname" "" "Enter a hostname" "string" "true"
-    define_arg "kernel" "" "Enter a hostname" "string" "true"
+    define_arg "kernel_headers" "" "Enter a hostname" "string" "true"
     define_arg "settings" "0" "Enter a settings" "integer" "true"
     define_arg "target_disk" "" "Enter a target disk" "string" "true"
     define_arg "is_encrypt" "" "Enter a encrypt" "string" "true"
@@ -49,7 +49,7 @@ input_arguments () {
 
     declare -A variables
 
-    variables=([USERNAME]=$username [PASSWORD]=$password [HOSTNAME]=$hostname [KERNEL]=$kernel [SETTINGS]=$settings [TARGET_DISK]=$target_disk [IS_ENCRYPT]=$is_encrypt [TIMEZONE]=$timezone)
+    variables=([USERNAME]=$username [PASSWORD]=$password [HOSTNAME]=$hostname [KERNEL_HEADERS]=$kernel_headers [SETTINGS]=$settings [TARGET_DISK]=$target_disk [IS_ENCRYPT]=$is_encrypt [TIMEZONE]=$timezone)
 
     for item in ${!variables[@]}; do
        update_env "$item" "${variables[$item]}"
