@@ -15,8 +15,8 @@ load_uefi() {
 
     storage_name="shingha"
     volgrp="scrubs"
-    new_disk="/${disk_name_tag}/${disk_name_target}${target_disk_prefix}2"
-    disk_uuid=$(blkid -s UUID -o value /${disk_name_tag}/${disk_name_target}${target_disk_prefix}2)
+    new_disk="/${disk_name_tag}/${disk_name_target}${disk_target_prefix}2"
+    disk_uuid=$(blkid -s UUID -o value /${disk_name_tag}/${disk_name_target}${disk_target_prefix}2)
     tag="GRUB_CMDLINE_LINUX=\"\""
     value="GRUB_CMDLINE_LINUX=\"cryptdevice=UUID=${disk_uuid}:${storage_name} root=\/dev\/mapper\/${volgrp}-ROOT\""
 

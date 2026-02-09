@@ -9,6 +9,8 @@ source $MAIN_PATH/bin/system_variable/cpu.sh
 source $MAIN_PATH/bin/system_variable/gpu.sh
 source $MAIN_PATH/bin/system_variable/verify_boot.sh
 
+[[ "$target_disk" == *nvme* ]] && $disk_target_prefix="p"
+
 declare -A variables
 
 variables=(
