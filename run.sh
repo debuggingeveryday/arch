@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set +e
-
 read -p "Username: " USERNAME;
 read -s -p "Password: " PASSWORD;
 echo
