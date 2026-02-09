@@ -29,11 +29,11 @@ if [[ "$IS_PROCEED" == "Y"  ]]; then
   ./arch --username "$USERNAME" \
     --password "$PASSWORD" \
     --hostname "$HOSTNAME" \
-    --kernel_headers $KERNEL_HEADERS \
+    --kernel_headers "$KERNEL_HEADERS" \
     --settings 0 \
     --target_disk "$DISK" \
     --is_encrypt $IS_ENCRYPT \
-    --timezone $TIMEZONE
+    --timezone "$TIMEZONE"
 else
   echo "NO"
 fi 
