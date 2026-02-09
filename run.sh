@@ -6,7 +6,7 @@ read -p "Username: " USERNAME;
 read -s -p "Password: " PASSWORD;
 echo
 read -p "Hostname: " HOSTNAME;
-KERNEL_HEADERS=$(echo -e "zen\nhardened\nlts\n--" | fzf --header "Kernel");
+KERNEL_HEADERS=$(echo -e "zen\nhardened\nlts\n\"\"" | fzf --header "Kernel");
 TIMEZONE=$(timedatectl list-timezones | fzf --header "Set timezone");
 DISK=$(lsblk -n --output TYPE,KNAME,SIZE | awk '$1=="disk"{print "/dev/"$2}' | fzf --header "Choose disk");
 IS_ENCRYPT=$(echo -e "NO\nYES" | fzf --header "Encrypt partition?");
