@@ -31,7 +31,7 @@ input_arguments () {
     define_arg "username" "" "Enter a username" "string" "true"
     define_arg "password" "" "Enter a password" "string" "true"
     define_arg "hostname" "" "Enter a hostname" "string" "true"
-    define_arg "kernel_headers" "" "Enter kernel_headers" "string" "false"
+    define_arg "kernel_headers" "null" "Enter kernel_headers" "string" "optional"
     define_arg "settings" "0" "Enter setting type" "integer" "true"
     define_arg "target_disk" "" "Enter a target disk" "string" "true"
     define_arg "is_encrypt" "" "Enter a encrypt" "string" "true"
